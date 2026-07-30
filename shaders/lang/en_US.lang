@@ -1,15 +1,15 @@
 #shaders/lang/en_us.lang
 
 #Profiles
-profile.POTATO=§aPotato
+profile.POTATO=§aCaveman PC
 profile.VERYLOW=§aVery Low
 profile.LOW=§aLow
 profile.MEDIUM=§aMedium
-profile.HIGH=§eHigh (Default)
+profile.HIGH=§eVibrantly Visual (Default)
 profile.VERYHIGH=§cVery High
 profile.ULTRA=§4§lUltra
-profile.COMPLEMENTARY=§4§l§n§oComplementary
-profile.comment=Shader profiles change performance settings with the most optimised visual fidelity to performance ratio. §e[*]§r It's recommended to use one of these profiles for your settings unless you know what you are doing. §e[*]§r All affected settings can all be found in the "Performance Settings" menu.
+profile.COMPLEMENTARY=§4§l§n§oAmethyst
+profile.comment=Shader profiles change performance settings with the most optimised visual fidelity to performance ratio. §e[*]§r It's recommended to use one of these profiles for your settings unless you know what you are doing. §e[*]§r All affected settings can all be found in the "Quick Settings" menu.
 
 #Information
 screen.INFORMATION=Information
@@ -61,13 +61,13 @@ option.info10.comment=EminGT: The main developer of Complementary. Capt Tatsu: D
 
 #Style
 option.SHADER_STYLE=Visual Style
-option.SHADER_STYLE.comment=Determines the default visual style of the shader pack. §bReimagined§r: Complementing Minecraft while preserving its unique visual elements. §dUnbound§r: Reworking the visuals of Minecraft with a semi-realistic fantasy style. §e[*]§r Affected settings: Water Style, Cloud Style, Sun/Moon Style, Sun/Moon Angle, Aurora Style, Glowing Ores.
-value.SHADER_STYLE.1=§bReimagined
-value.SHADER_STYLE.4=§dUnbound
+option.SHADER_STYLE.comment=Determines the default visual style of the shader pack. §dFantasy§r: §b(formerly Reimagined)§f Default and Our Favourite Style. Based on Complementary Reimagined. §eRealistic§r: §d(formerly Unbound)§f Applies the same tweaks to default Complementary as Amethyst Reimagined, but with the Complementary Unbound visual style. §e[*]§r Affected settings: Water Style, Cloud Style, Sun/Moon Style, Sun/Moon Angle, Aurora Style, Glowing Ores.
+value.SHADER_STYLE.1=§dFantasy
+value.SHADER_STYLE.4=§eRealistic
 
 #Screens
-screen.PERFORMANCE_SETTINGS=§ePerformance Settings§r
-screen.PERFORMANCE_SETTINGS.comment=Settings that directly relate to the performance, and get changed by the different shader profiles.
+screen.PERFORMANCE_SETTINGS=§eQuick Settings§r
+screen.PERFORMANCE_SETTINGS.comment=Pre-defined settings menu for quick access. Automatically changes with shader profile. Most settings will affect performance.
 
 screen.ATMOSPHERE_SETTINGS=Atmosphere
 screen.ATMOSPHERE_SETTINGS.comment=Settings that relate to the atmosphere.
@@ -88,8 +88,8 @@ screen.CLOUD_SETTINGS.comment=Settings that relate to the clouds.
 screen.CLOUD_COLOR_SETTINGS=Cloud Color
 screen.CLOUD_COLOR_SETTINGS.comment=Settings to change the color of the clouds.
 
-screen.CLOUD_UNBOUND_SETTINGS=Unbound Cloud Settings
-screen.CLOUD_REIMAGINED_SETTINGS=Reimagined Cloud Settings
+screen.CLOUD_UNBOUND_SETTINGS=Realistic Cloud Settings
+screen.CLOUD_REIMAGINED_SETTINGS=Fantasy Cloud Settings
 
 screen.FOG_SETTINGS=Fog
 screen.FOG_SETTINGS.comment=Settings that relate to the various types of fog.
@@ -172,7 +172,7 @@ screen.WATER_COLOR_SETTINGS=Water Surface Color
 screen.UNDERWATER_COLOR_SETTINGS=Underwater Color
 
 screen.WATER_WAVE_SETTINGS=Waving Water Normals §e[*]§r
-screen.WATER_WAVE_SETTINGS.comment=Settings to customise the surface-direction waves (normals) seen on water. §e[*]§r These settings only work when the Water Style is set to "Reimagined + Waves" or "Unbound".
+screen.WATER_WAVE_SETTINGS.comment=Settings to customise the surface-direction waves (normals) seen on water. §e[*]§r These settings only work when the Water Style is set to "Fantasy + Waves" or "Realistic".
 
 screen.WAVING_SETTINGS=Waving Textures
 screen.WAVING_SETTINGS.comment=Settings that are about waving textures.
@@ -195,7 +195,7 @@ value.RP_MODE.2=§eseuspbr (RP Required)
 value.RP_MODE.3=§elabPBR (RP Required)
 
 option.WATER_REFLECT_QUALITY=Water Reflection Quality
-option.WATER_REFLECT_QUALITY.comment=Adjusts the visual quality of reflections that appear on translucents. §cMedium§r: Screenspace ray-traced reflections on water and translucents. §ePotato§r: Replaces water and translucent reflections with a faster method, may look incorrect in some situations. §aOFF§r: No reflections.
+option.WATER_REFLECT_QUALITY.comment=Adjusts the visual quality of reflections that appear on translucents. §cMedium§r: Screenspace ray-traced reflections on water and translucents. §eCaveman PC§r: Replaces water and translucent reflections with a faster method, may look incorrect in some situations. §aOFF§r: No reflections.
 value.WATER_REFLECT_QUALITY.-1=§aOFF
 value.WATER_REFLECT_QUALITY.0=§aSky only
 value.WATER_REFLECT_QUALITY.1=§ePotato
@@ -255,7 +255,7 @@ value.DETAIL_QUALITY.2=§eMedium
 value.DETAIL_QUALITY.3=§cHigh
 
 option.CLOUD_QUALITY=Cloud Quality
-option.CLOUD_QUALITY.comment=Adjusts the lighting, detail, and sample quality of Reimagined/Unbound cloud styles. §e[*]§r This setting only works with the "Reimagined" or "Unbound" Cloud Styles.
+option.CLOUD_QUALITY.comment=Adjusts the lighting, detail, and sample quality of Fantasy/Realistic cloud styles. §e[*]§r This setting only works with the "Fantasy" or "Realistic" Cloud Styles.
 value.CLOUD_QUALITY.0=§aOFF
 value.CLOUD_QUALITY.1=§aLow
 value.CLOUD_QUALITY.2=§eMedium
