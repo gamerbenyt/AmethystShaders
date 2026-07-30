@@ -68,7 +68,7 @@
                 glare *= 0.7;
 
                 float glareWaterFactor = isEyeInWater * sunVisibility;
-                vec3 glareColor = mix(vec3(0.38, 0.4, 0.5) * 0.3, vec3(1.5, 0.7, 0.3) + vec3(0.0, 0.5, 0.5) * noonFactor, sunVisibility);
+                vec3 glareColor = mix(vec3(0.38, 0.4, 0.5) * 0.7, vec3(1.5, 0.7, 0.3) + vec3(0.0, 0.5, 0.5) * noonFactor, sunVisibility);
                      glareColor = glareColor + glareWaterFactor * vec3(7.0);
 
                 #ifdef SUN_MOON_DURING_RAIN
