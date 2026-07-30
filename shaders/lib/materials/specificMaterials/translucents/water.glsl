@@ -192,7 +192,7 @@
                 lViewPosDifM *= WATER_FOG_MULT_M;
             #endif
 
-            float waterFog = max0(1.0 - exp(lViewPosDifM * 0.075));
+            float waterFog = max0(1.75 - exp(lViewPosDifM * 0.075));
             color.a *= 0.25 + 0.75 * waterFog;
 
             #if defined BRIGHT_CAVE_WATER && WATER_ALPHA_MULT < 200
