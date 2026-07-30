@@ -1,6 +1,6 @@
 #include "/lib/atmospherics/clouds/cloudCoord.glsl"
 
-const float cloudStretch = 4.2;
+const float cloudStretch = 5.5;
 const float cloudTallness = cloudStretch * 2.0;
 const float cloudRoundness = 0.125;
 
