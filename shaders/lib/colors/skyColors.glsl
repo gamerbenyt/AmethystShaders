@@ -9,8 +9,8 @@
         vec3 skyColorM2 = mix(max(skyColor, sunFactor * vec3(0.265, 0.295, 0.35)), skyColor, invRainStrength2);
 
         #ifdef SPECIAL_BIOME_WEATHER
-            vec3 nmscSnowM = inSnowy * vec3(-0.1, 0.3, 0.6);
-            vec3 nmscDryM = inDry * vec3(-0.1, -0.2, -0.3);
+            vec3 nmscSnowM = inSnowy * vec3(-0.3, 0.05, 0.2);
+            vec3 nmscDryM = inDry * vec3(0.3);
             vec3 ndscSnowM = inSnowy * vec3(-0.25, -0.01, 0.25);
             vec3 ndscDryM = inDry * vec3(-0.05, -0.09, -0.1);
         #else
@@ -34,8 +34,8 @@
         vec3 ndscWeatherM = vec3(-0.15, -0.3, -0.42) + vec3(0.0, 0.02, 0.08) * noonFactor;
 
         vec3 noonUpSkyColor     = pow(skyColorM, vec3(7.9)) * (vec3(0.85, 0.92, 0.81) + rainFactor * nuscWeatherM);
-        vec3 noonMiddleSkyColor = pow(skyColorM, vec3(1.5)) * (vec3(1.3) + rainFactor * (nmscWeatherM + nmscRainM + nmscSnowM + nmscDryM))
-                                + noonUpSkyColor * 0.65;
+        vec3 noonMiddleSkyColor = pow(skyColorM, vec3(0.75)) * (vec3(1.3) + rainFactor * (nmscWeatherM + nmscRainM + nmscSnowM + nmscDryM))
+                                + noonUpSkyColor * 0.6;
         vec3 noonDownSkyColor   = skyColorM * (vec3(0.161, 0.282, 0.882) + rainFactor * (ndscWeatherM + ndscRainM + ndscSnowM + ndscDryM))
                                 + noonUpSkyColor * 0.25;
 
@@ -49,7 +49,7 @@
         vec3 dayDownSkyColor   = mix(noonDownSkyColor, sunsetDownSkyColor, invNoonFactor2);
 
         vec3 nightColFactor      = vec3(0.3961, 0.0706, 0.8196) * (1.0 - 0.5 * rainFactor) + skyColor;
-        vec3 nightUpSkyColor     = pow(nightColFactor, vec3(0.90)) * 0.45;
+        vec3 nightUpSkyColor     = pow(nightColFactor, vec3(0.90)) * 0.4;
         vec3 nightMiddleSkyColor = sqrt(nightUpSkyColor) * 0.68;
         vec3 nightDownSkyColor   = nightMiddleSkyColor * vec3(0.82, 0.82, 0.88);
     #endif
