@@ -21,13 +21,13 @@ vec3 GetColoredLightFog(vec3 nPlayerPos, vec3 translucentMult, float lViewPos, f
 
         float lTracePosM = length(
             vec3(
-                tracePos.x, 
+                tracePos.x,
                 #if COLORED_LIGHTING_INTERNAL <= 512
-                    tracePos.y * 2.0, 
+                    tracePos.y * 2.0,
                 #elif COLORED_LIGHTING_INTERNAL == 768
-                    tracePos.y * 3.0, 
+                    tracePos.y * 3.0,
                 #elif COLORED_LIGHTING_INTERNAL == 1024
-                    tracePos.y * 4.0, 
+                    tracePos.y * 4.0,
                 #endif
                 tracePos.z
             )

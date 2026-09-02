@@ -20,7 +20,7 @@
     #endif
 
     #if IPBR_EMISSIVE_MODE != 1 && !defined VOXY_PATCH
-        emission = GetCustomEmissionForIPBR(color, emission);
+        emission = GetCustomEmissionForIPBR(color, glColor, emission);
     #endif
 #else
     #ifdef CUSTOM_PBR
@@ -34,10 +34,8 @@
         #if defined GBUFFERS_TERRAIN || defined VOXY_PATCH
             DoFoliageColorTweaks(color.rgb, shadowMult, snowMinNdotU, viewPos, nViewPos, lViewPos, dither);
         #endif
-    } else if (mat == 10009) { // Leaves
+    } else if (mat == 10009 || mat == 10011) { // Leaves
         #include "/lib/materials/specificMaterials/terrain/leaves.glsl"
-    } else if (mat == 10013) { // Vine
-        subsurfaceMode = 3, centerShadowBias = true; noSmoothLighting = true;
     } else if (mat == 10017) { // Non-waving Foliage
         subsurfaceMode = 1, noSmoothLighting = true, noDirectionalShading = true;
     } else if (mat == 10021) { // Upper Waving Foliage
@@ -48,6 +46,8 @@
     } else if (mat == 10028) { // Modded Light Sources
         noSmoothLighting = true; noDirectionalShading = true;
         emission = GetLuminance(color.rgb) * 2.5;
+    } else if (mat == 11009) { // Vine, Pale Hanging Moss
+        subsurfaceMode = 3, centerShadowBias = true; noSmoothLighting = true;
     }
 
     #ifdef SNOWY_WORLD

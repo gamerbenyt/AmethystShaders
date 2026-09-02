@@ -116,7 +116,7 @@ void main() {
 		}
 	#endif
 
-	vec4 light = vec4(0.0);	
+	vec4 light = vec4(0.0);
 	uint rawData = GetVoxelVolumeRaw(pos);
 	uint voxel = rawData & 32767u;
 	uint isColorwheelGeometry = (rawData - voxel) >> 15u;

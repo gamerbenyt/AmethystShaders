@@ -65,7 +65,7 @@ vec4 GetClouds(inout float cloudLinearDepth, float skyFade, vec3 cameraPosOffset
         #endif
 
         int modFactorM = int(modFactor);
-        
+
         vec2 cameraPositionBIM = cameraPositionInt.xz - modFactorM * (cameraPositionInt.xz / modFactorM);
 
         vec3 cameraPos = vec3(

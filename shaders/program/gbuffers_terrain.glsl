@@ -20,7 +20,6 @@ in vec2 signMidCoordPos;
 flat in vec2 absMidCoordPos;
 flat in vec2 midCoord;
 
-flat in vec3 upVec, sunVec, northVec, eastVec;
 in vec3 normal;
 in vec3 vertexPos;
 
@@ -54,6 +53,12 @@ in vec4 glColorRaw;
 #endif
 
 //Common Variables//
+vec3 upVec = normalize(gbufferModelView[1].xyz);
+vec3 eastVec = normalize(gbufferModelView[0].xyz);
+vec3 northVec = normalize(gbufferModelView[2].xyz);
+
+vec3 sunVec = GetSunVector();
+
 float NdotU = dot(normal, upVec);
 float geoNdotU = NdotU;
 float NdotUmax0 = max(NdotU, 0.0);
@@ -392,7 +397,6 @@ out vec2 signMidCoordPos;
 flat out vec2 absMidCoordPos;
 flat out vec2 midCoord;
 
-flat out vec3 upVec, sunVec, northVec, eastVec;
 out vec3 normal;
 out vec3 vertexPos;
 
@@ -448,10 +452,6 @@ void main() {
     glColor = glColorRaw;
 
     normal = normalize(gl_NormalMatrix * gl_Normal);
-    upVec = normalize(gbufferModelView[1].xyz);
-    eastVec = normalize(gbufferModelView[0].xyz);
-    northVec = normalize(gbufferModelView[2].xyz);
-    sunVec = GetSunVector();
 
     midCoord = (gl_TextureMatrix[0] * mc_midTexCoord).st;
     vec2 texMinMidCoord = texCoord - midCoord;
@@ -459,10 +459,6 @@ void main() {
     absMidCoordPos  = abs(texMinMidCoord);
 
     mat = int(mc_Entity.x + 0.5);
-
-    #if ANISOTROPIC_FILTER > 0
-        if (mc_Entity.y > 0.5 && dot(normal, upVec) < 0.999) absMidCoordPos = vec2(0.0); // Fix257062
-    #endif
 
     vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
     vertexPos = position.xyz;
@@ -502,6 +498,9 @@ void main() {
     #endif
 
     #if ANISOTROPIC_FILTER > 0
+        vec3 upVec = normalize(gbufferModelView[1].xyz);
+        if (mc_Entity.y > 0.5 && dot(normal, upVec) < 0.999) absMidCoordPos = vec2(0.0); // Fix257062
+
         vec2 spriteRadius = abs(texCoord - mc_midTexCoord.xy);
         vec2 bottomLeft = mc_midTexCoord.xy - spriteRadius;
         vec2 topRight = mc_midTexCoord.xy + spriteRadius;

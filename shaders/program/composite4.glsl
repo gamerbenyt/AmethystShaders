@@ -31,7 +31,8 @@ vec2 view = vec2(viewWidth, viewHeight);
 vec3 BloomTile(float lod, vec2 offset, vec2 scaledCoord) {
     vec3 bloom = vec3(0.0);
     float scale = exp2(lod);
-    vec2 coord = (scaledCoord - offset) * scale;
+    vec2 scaledCoordMinusOffset = scaledCoord - offset;
+    vec2 coord = scaledCoordMinusOffset * scale;
     float padding = 0.5 + 0.005 * scale;
 
     if (abs(coord.x - 0.5) < padding && abs(coord.y - 0.5) < padding) {
@@ -39,7 +40,7 @@ vec3 BloomTile(float lod, vec2 offset, vec2 scaledCoord) {
             for (int j = -3; j <= 3; j++) {
                 float wg = weight[i + 3] * weight[j + 3];
                 vec2 pixelOffset = vec2(i, j) / view;
-                vec2 bloomCoord = (scaledCoord - offset + pixelOffset) * scale;
+                vec2 bloomCoord = (scaledCoordMinusOffset + pixelOffset) * scale;
                 bloom += texture2D(colortex0, bloomCoord).rgb * wg;
             }
         }
@@ -139,7 +140,7 @@ void main() {
             for (int i = 0; i < sampleCount; i++, coord += velocity) {
                 vec2 coordb = clamp(coord, doublePixel, 1.0 - doublePixel);
                 vec3 sampleb = texture2DLod(colortex0, coordb, 0).rgb;
-                
+
                 #ifdef MOTION_BLUR_BLOOM_FOG_FIX
                     float z1 = texture2D(depthtex1, coordb).r;
                     vec4 screenPos = vec4(coordb, z1, 1.0);
@@ -169,7 +170,7 @@ void main() {
                 mbwg += 1.0;
             }
             color /= mbwg;
-            
+
             #ifdef MOTION_BLUR_BLOOM_FOG_FIX
                 // Reapply bloom fog because we removed it from our samples
                 color *= GetBloomFog(lViewPos);

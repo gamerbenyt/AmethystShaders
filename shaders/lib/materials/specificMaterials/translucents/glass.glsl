@@ -11,7 +11,7 @@ if (minAlpha > 0.001) {
 
     translucentMultCalculated = true;
     translucentMult = vec4(0.0, 0.0, 0.0, 1.0);
-} 
+}
 
 else {
     #ifdef FANCY_GLASS

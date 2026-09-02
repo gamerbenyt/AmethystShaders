@@ -29,7 +29,26 @@ beginTextM(4, vec2(15, 36));
     ));
 endText(color.rgb);
 
-beginTextM(2, vec2(30, 155));
+beginTextM(2, vec2(30, 153));
+    printLine();
+    text.fgCol = vec4(vec3(0.65), 1.0);
+    printString((
+        _O, _r, _space, _d, _i, _s, _a, _b, _l, _e, _space, _t, _h, _e, _space, _f, _e, _a, _t, _u, _r, _e, _space, _u, _n, _d, _e, _r, _colon, _space
+    ));
+    printLine();
+    printString((
+        _E, _S, _C, _space, _gt, _space, _O, _p, _t, _i, _o, _n, _s, _space, _gt, _space,
+        _S, _h, _a, _d, _e, _r, _space, _S, _e, _t, _t, _i, _n, _g, _s,
+        _space, _gt
+    ));
+    printLine();
+    printString((
+        _P, _e, _r, _f, _o, _r, _m, _a, _n, _c, _e, _space, _gt, _space,
+        _A, _d, _v, _a, _n, _c, _e, _d, _space, _C, _o, _l, _o, _r, _space, _T, _r, _a, _c, _i, _n, _g
+    ));
+endText(color.rgb);
+
+beginTextM(2, vec2(30, 188));
     printLine();
     text.fgCol = vec4(vec3(0.65), 1.0);
     printString((
@@ -61,7 +80,7 @@ beginTextM(2, vec2(30, 155));
     ));
 endText(color.rgb);
 
-beginTextM(2, vec2(30, 200));
+beginTextM(2, vec2(30, 232));
     printLine();
     text.fgCol = vec4(vec3(0.65), 1.0);
     printString((

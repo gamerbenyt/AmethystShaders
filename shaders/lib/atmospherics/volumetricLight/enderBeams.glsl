@@ -13,7 +13,7 @@
         return noise / 3.0;
     }
 
-    vec3 DrawEnderBeams(vec3 playerPos, vec3 nViewPos, float scale) {
+    vec3 DrawEnderBeams(float vlFactor, vec3 playerPos, vec3 nViewPos, float scale) {
         float beamPowBeforeAltitude = 1.0;
         float beamPowAfterAltitude = 1.75;
         float lPlayerPosXZ = length(playerPos.xz);
@@ -28,7 +28,7 @@
 
             float endFlashDirectionFactor = pow(max0(dot(worldEndFlashPosition, nViewPosWorldM)), 32.0 - 24.0 * vlFactor);
             float endFlashFactor = endFlashIntensityM * endFlashDirectionFactor;
-            
+
             endFlashFactor *= smoothstep(0.0, 512.0, lPlayerPosXZ);
 
             beamOrangeIncreaser = mix(beamOrangeIncreaser, 1.5, endFlashFactor);
@@ -52,7 +52,7 @@
         float altitudeDis = abs(altitude - END_BEAM_CENTER_ALT);
         float altitudeFactor = 0.5 * smoothstep(uncenteredDistance, 0.0, altitudeDis)
                              + 0.5 * smoothstep(4.0 * uncenteredDistance, 0.0, altitudeDis);
-        
+
         noise = pow2(noise) * 0.7 + 0.3 * fireNoise;
         noise = pow(noise, beamPowBeforeAltitude);
         noise *= pow(altitudeFactor, 4.0);

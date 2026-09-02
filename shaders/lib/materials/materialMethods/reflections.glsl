@@ -59,7 +59,7 @@ vec4 GetReflection(inout vec3 normalM, vec3 viewPos, vec3 nViewPos, vec3 playerP
     #if WORLD_SPACE_REFLECTIONS_INTERNAL > 0 && defined COMPOSITE && WATER_REFLECT_QUALITY >= 1
         // In COMPOSITE for translucents we just need to return WSR and that's it
         if (z0 != z1) {
-            vec4 reflection = getWSR(playerPos, normalMR, nViewPosR, RVdotU, RVdotS, z0, dither, refDist);
+            vec4 reflection = getWSR(playerPos, normalMR, nViewPosR, RVdotU, RVdotS, z0, dither, refDist, true);
             return reflection;
         }
     #endif
@@ -147,13 +147,13 @@ vec4 GetReflection(inout vec3 normalM, vec3 viewPos, vec3 nViewPos, vec3 playerP
             #endif
 
             #ifdef VOXY_PATCH
-                if (refPos.x > 0.0 && refPos.x < 1.0 && refPos.y > 0.0 && refPos.y < 1.0) 
+                if (refPos.x > 0.0 && refPos.x < 1.0 && refPos.y > 0.0 && refPos.y < 1.0)
                 {
                     // Previous frame reprojection from Chocapic13
                     // Voxy water needs reflection reprojection due to rendering before deferred
                     vec4 viewPosPrev = vxProjInv * vec4(refPos * 2.0 - 1.0, 1.0);
                     viewPosPrev /= viewPosPrev.w;
-                    
+
                     viewPosPrev = vxModelViewInv * viewPosPrev;
 
                     vec4 previousPosition = viewPosPrev + vec4(cameraPosition - previousCameraPosition, 0.0);
@@ -238,7 +238,7 @@ vec4 GetReflection(inout vec3 normalM, vec3 viewPos, vec3 nViewPos, vec3 playerP
 
             if (screenPosRM.x < rEdge.x && screenPosRM.y < rEdge.y) {
                 vec2 edgeFactor = pow2(pow2(pow2(screenPosRM / rEdge)));
-                screenPosR.y += (dither - 0.5) * (0.03 * (edgeFactor.x + edgeFactor.y) + 0.004);
+                screenPosR.y += (dither - 0.5) * (0.03 * (edgeFactor.x + edgeFactor.y) + 0.001);
                 float z1R = texture2D(depthtex1, screenPosR.xy).x;
                 screenPosR.z = z1R;
                 vec3 viewPosR = ScreenToView(screenPosR);
@@ -250,11 +250,11 @@ vec4 GetReflection(inout vec3 normalM, vec3 viewPos, vec3 nViewPos, vec3 playerP
                     vec4 viewPos1DH = dhProjectionInverse * (screenPos1DH * 2.0 - 1.0);
                     viewPos1DH /= viewPos1DH.w;
                     lViewPosR = min(lViewPosR, length(viewPos1DH.xyz));
-                    
+
                     z1R = min(z1R, z1RDH);
                 #endif
 
-                if (z1R < 0.9997 && lViewPos <= 2.0 + lViewPosR) {
+                if (z1R < 0.9999 && lViewPos <= 2.0 + lViewPosR) {
                     reflection.rgb = texture2D(gaux2, screenPosR.xy).rgb;
                     reflection.rgb = pow2(reflection.rgb * 2.0);
 
@@ -283,7 +283,7 @@ vec4 GetReflection(inout vec3 normalM, vec3 viewPos, vec3 nViewPos, vec3 playerP
     {
         AddBackgroundReflection(reflection, color, playerPos, normalM, normalMR, nViewPos, nViewPosR,
                                 shadowMult, RVdotU, RVdotS, z0, dither, skyLightFactor, smoothness, highlightMult);
-    } 
+    }
     // ============================== End of Step 3 ============================== //
 
     // Tweak for wsr water ref normals to look correct

@@ -1,5 +1,3 @@
-vec3 blocklightCol = vec3(0.1775, 0.104, 0.077) * vec3(XLIGHT_R, XLIGHT_G, XLIGHT_B);
-
 void AddSpecialLightDetail(inout vec3 light, vec3 albedo, float emission) {
 	vec3 lightM = max(light, vec3(0.0));
 	lightM /= (0.2 + 0.8 * GetLuminance(lightM));
@@ -8,13 +6,24 @@ void AddSpecialLightDetail(inout vec3 light, vec3 albedo, float emission) {
 	light += pow2(lightM / (albedo + 0.1));
 }
 
-vec3 fireSpecialLightColor = vec3(2.25, 0.83, 0.27) * 3.7;
+vec3 blocklightCol = vec3(0.1775, 0.104, 0.077) * vec3(XLIGHT_R, XLIGHT_G, XLIGHT_B);
+
+vec3 fireSpecialLightColorBase = vec3(2.25, 0.83, 0.27) * 3.7;
+#if ACT_FIRE_COLOR_WARMNESS == 100
+	vec3 fireSpecialLightColor = fireSpecialLightColorBase;
+#elif ACT_FIRE_COLOR_WARMNESS < 100
+	vec3 fireSpecialLightColor = mix(blocklightCol * 25.0, fireSpecialLightColorBase, float(ACT_FIRE_COLOR_WARMNESS) * 0.01);
+#elif ACT_FIRE_COLOR_WARMNESS > 100
+	vec3 fireSpecialLightColor = mix(fireSpecialLightColorBase, vec3(1.0, 0.2, 0.0) * 8.0, float(ACT_FIRE_COLOR_WARMNESS - 100) * 0.01);
+#endif
+
 vec3 lavaSpecialLightColor = vec3(3.25, 0.9, 0.2) * 3.9;
 vec3 netherPortalSpecialLightColor = vec3(1.8, 0.4, 2.2) * 0.8;
 vec3 redstoneSpecialLightColor = vec3(4.0, 0.1, 0.1);
 vec4 soulFireSpecialColor = vec4(vec3(0.3, 2.0, 2.2) * 1.0, 0.3);
 float candleColorMult = 2.0;
 float candleExtraLight = 0.004;
+
 vec4 GetSpecialBlocklightColor(int mat) {
 	/* Please note that these colors do not determine the intensity of the
 	final light. Instead; higher values of color change how long the color

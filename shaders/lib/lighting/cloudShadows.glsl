@@ -46,7 +46,7 @@
                     cloudOffset2.z += distToCloudLayer2 / NVdotLM;
                 #endif
                 vec2 cloudPos2 = GetRoundedCloudCoord(ModifyTracePos(worldPos + cloudOffset2, cloudAlt2i).xz, 0.35);
-                
+
                 #ifndef COMPOSITE
                     float cloudSample2 = texture2D(gaux4, cloudPos2).b;
                 #else

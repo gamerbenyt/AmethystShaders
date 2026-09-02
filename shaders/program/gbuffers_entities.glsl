@@ -177,7 +177,7 @@ void main() {
             #endif
 
             #if IPBR_EMISSIVE_MODE != 1
-                emission = GetCustomEmissionForIPBR(color, emission);
+                emission = GetCustomEmissionForIPBR(color, glColor, emission);
             #endif
         #else
             #ifdef CUSTOM_PBR
@@ -241,7 +241,7 @@ void main() {
     gl_FragData[1] = vec4(1.0 - translucentMult, 1.0);
     gl_FragData[2] = vec4(smoothnessD, materialMask, skyLightFactor, 1.0);
 
-    #if BLOCK_REFLECT_QUALITY >= 2 && RP_MODE >= 1
+    #if BLOCK_REFLECT_QUALITY >= 2 && RP_MODE >= 1 || defined WORLD_SPACE_REFLECTIONS > 0
         /* DRAWBUFFERS:0364 */
         gl_FragData[3] = vec4(mat3(gbufferModelViewInverse) * normalM, 1.0);
     #endif

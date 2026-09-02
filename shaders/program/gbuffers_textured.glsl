@@ -60,6 +60,8 @@ void main() {
     vec4 colorP = color;
     color *= glColor;
 
+    if (color.a < 0.01) discard;
+
     vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
     vec3 viewPos = ScreenToView(screenPos);
     float lViewPos = length(viewPos);
@@ -176,6 +178,11 @@ void main() {
     gl_FragData[0] = color;
     gl_FragData[1] = vec4(0.0, materialMask, 0.0, 1.0);
     gl_FragData[2] = vec4(1.0 - translucentMult, 1.0);
+
+    #if WATER_REFLECT_QUALITY > 0 && WORLD_SPACE_REFLECTIONS > 0
+        /* DRAWBUFFERS:0634 */
+        gl_FragData[3] = vec4(0.0, 1.0, 0.0, 1.0);
+    #endif
 }
 
 #endif

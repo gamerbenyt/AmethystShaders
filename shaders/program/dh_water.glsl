@@ -43,7 +43,7 @@ mat4 gbufferProjectionInverse = dhProjectionInverse;
     vec3 lightVec = sunVec;
 #endif
 
-#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && WATER_MAT_QUALITY >= 2 || defined GENERATED_NORMALS || defined CUSTOM_PBR
+#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && !defined LOW_QUALITY_WATER_MATERIAL || defined GENERATED_NORMALS || defined CUSTOM_PBR
     mat3 tbnMatrix = mat3(
         eastVec.x, northVec.x, normal.x,
         eastVec.y, northVec.y, normal.y,
@@ -68,7 +68,7 @@ mat4 gbufferProjectionInverse = dhProjectionInverse;
 #endif
 
 #if WATER_REFLECT_QUALITY >= 0
-    #if defined SKY_EFFECT_REFLECTION && defined OVERWORLD
+    #if defined SKY_EFFECT_REFLECTION_TRANSLUCENT && defined OVERWORLD
         #if AURORA_STYLE > 0
             #include "/lib/atmospherics/auroraBorealis.glsl"
         #endif
@@ -79,7 +79,7 @@ mat4 gbufferProjectionInverse = dhProjectionInverse;
             #include "/lib/atmospherics/stars.glsl"
         #endif
 
-        #ifdef VL_CLOUDS_ACTIVE 
+        #ifdef VL_CLOUDS_ACTIVE
             #include "/lib/atmospherics/clouds/mainClouds.glsl"
         #endif
     #endif
@@ -138,7 +138,7 @@ void main() {
     if (mat == DH_BLOCK_WATER) {
         #include "/lib/materials/specificMaterials/translucents/water.glsl"
     }
-    
+
     float fresnelM = (pow3(fresnel) * 0.85 + 0.15) * reflectMult;
 
     float lengthCylinder = max(length(playerPos.xz), abs(playerPos.y) * 2.0);
@@ -218,7 +218,7 @@ void main() {
     mat = dhMaterialId;
 
     lmCoord  = GetLightMapCoordinates();
-    
+
     normal = normalize(gl_NormalMatrix * gl_Normal);
     upVec = normalize(gbufferModelView[1].xyz);
     eastVec = normalize(gbufferModelView[0].xyz);

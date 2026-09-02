@@ -8,7 +8,7 @@
 #endif
 
 #if defined OVERWORLD || defined END
-    #ifndef GBUFFERS_WATER 
+    #ifndef GBUFFERS_WATER
         #include "/lib/lighting/shadowSampling.glsl"
         #if defined DO_PIXELATION_EFFECTS && defined PIXELATED_SHADOWS
             #include "/lib/misc/pixelation.glsl"
@@ -55,7 +55,7 @@ float getVoxelSpaceAO(ivec3 voxelPos, ivec3 normal, vec2 localTexCoord) {
 
     ivec2 signDir = ivec2(sign(dir));
     ivec3 voxelHrz = voxelPos + normal + signDir.x * hrz;
-    ivec3 voxelVrt = voxelPos + normal + signDir.y * vrt; 
+    ivec3 voxelVrt = voxelPos + normal + signDir.y * vrt;
 
     vec2 factor = pow2(dir);
     float occHrz = mix(1.0, float(texelFetch(wsr_sampler, voxelHrz, 0).r == 0u), factor.x);
@@ -67,9 +67,9 @@ float getVoxelSpaceAO(ivec3 voxelPos, ivec3 normal, vec2 localTexCoord) {
 vec4 getShadedReflection(ivec3 voxelPos, vec3 oldPlayerPos, vec3 playerPos, vec3 rayDir, vec3 normal, uint mat, float dither) {
     faceData faceData = getFaceData(voxelPos, normal);
     if (faceData.textureBounds.z < 1e-6) return vec4(-1.0);
-     
+
     vec2 localTexCoord = getLocalTexCoord(fract(playerPos + cameraPositionBestFract), normal);
-    
+
     vec2 textureSizeAtlas = textureSize(textureAtlas, 0);
     vec2 textureRadVec2 = faceData.textureBounds.z * vec2(1.0, textureSizeAtlas.x / textureSizeAtlas.y);
     vec2 textureCoord = faceData.textureBounds.xy + 2.0 * textureRadVec2 * localTexCoord;
@@ -139,16 +139,16 @@ vec4 getShadedReflection(ivec3 voxelPos, vec3 oldPlayerPos, vec3 playerPos, vec3
     #else
         float lightingNdotL = max0(NdotL);
     #endif
-    
+
     #ifndef NETHER
         vec3 shadow = shadowMult;
         if (lightingNdotL > 0.0001) {
             float shadowLength = shadowDistance * 0.9166667 - length(playerPos); //consistent08JJ622
             if (shadowLength > 0.000001) {
                 float distanceBias = 0.12 + 0.0008 * pow(dot(playerPos, playerPos), 0.75);
-                vec3 bias = normal * distanceBias * (2.0 - 0.95 * max0(NdotL));  
+                vec3 bias = normal * distanceBias * (2.0 - 0.95 * max0(NdotL));
                 int shadowSamples = 2;
-                
+
                 shadow = GetShadow(GetShadowPos(playerPos + bias), faceData.lightmap.y, offset, shadowSamples, false, playerPos);
             }
         }
@@ -205,7 +205,7 @@ vec4 getShadedReflection(ivec3 voxelPos, vec3 oldPlayerPos, vec3 playerPos, vec3
 
     vec3 fadeout = smoothstep(0.0, 32.0, 0.5 * sceneVoxelVolumeSize - abs(playerPos));
     float alphaFade = sqrt3(minOf(fadeout)) * 0.9 + 0.1;
-    
+
     return vec4(color.rgb * lighting + maRecolor, alphaFade);
 }
 
@@ -217,11 +217,11 @@ vec4 voxelRayTrace(vec3 playerPos, vec3 voxelPos, vec3 rayDir, float RVdotU, flo
     float dist1 = 0.0;
     vec3 voxelPosRT1 = voxelPos * 0.25;
     vec3 nextDist1 = (stepDir * 0.5 + 0.5 - fract(voxelPosRT1)) / rayDir;
-    
+
     while (CheckInsideLodVoxelVolume(voxelPosRT1)) {
         if (texelFetch(wsr_lod_sampler, ivec3(voxelPosRT1), 0).r > 0u) {
             float dist0 = 0.0;
-            vec3 voxelPosRT0 = playerToSceneVoxel(playerPos + 4.0 * dist1 * rayDir);
+            vec3 voxelPosRT0 = playerToSceneVoxel(playerPos + (4.0 * dist1 - 0.001) * rayDir); // consistency59SMG32: 0.001 offset to fix rare wsr glitches
             vec3 nextDist0 = (stepDir * 0.5 + 0.5 - fract(voxelPosRT0)) / rayDir;
 
             vec3 lodVoxelMin = floor(voxelPosRT1) * 4.0;
@@ -235,7 +235,7 @@ vec4 voxelRayTrace(vec3 playerPos, vec3 voxelPos, vec3 rayDir, float RVdotU, flo
                     traceLength = 4.0 * dist1 + dist0;
 
                     vec3 normal = -stepAxis * stepDir;
-                    vec3 intersection = playerPos + traceLength * rayDir;
+                    vec3 intersection = playerPos + (traceLength - 0.001) * rayDir; // consistency59SMG32: 0.001 offset to fix rare wsr glitches
 
                     vec4 reflection = getShadedReflection(ivec3(voxelPosRT0), playerPos, intersection, rayDir, normal, mat, dither);
                     if (reflection.a > -0.5) {
@@ -258,7 +258,7 @@ vec4 voxelRayTrace(vec3 playerPos, vec3 voxelPos, vec3 rayDir, float RVdotU, flo
 
                 nextDist0 += stepAxis * stepSizes;
                 voxelPosRT0 += stepAxis * stepDir;
-            }      
+            }
         }
 
         dist1 = minOf(nextDist1);
@@ -272,16 +272,22 @@ vec4 voxelRayTrace(vec3 playerPos, vec3 voxelPos, vec3 rayDir, float RVdotU, flo
     return vec4(0.0);
 }
 
-vec4 getWSR(vec3 playerPos, vec3 normalMR, vec3 nViewPosR, float RVdotU, float RVdotS, float z0, float dither, out float wsrTraceLength) {
-    vec3 normalOffset = normalize(mat3(gbufferModelViewInverse) * normalMR);
+vec4 getWSR(vec3 playerPos, vec3 normalMR, vec3 nViewPosR, float RVdotU, float RVdotS, float z0, float dither, out float wsrTraceLength, bool isTranslucent) {
+    vec3 worldNormal = normalize(mat3(gbufferModelViewInverse) * normalMR);
+    float normalOffsetDist = 0.04; // Fixes artifacts. 0.03 is enough but use slightly higher to make sure
 
-    // Fix self-reflection and also align non-full blocks' trace start position to the grid
-    float normalOffsetDist = 1.0 - fract(dot(playerPos + cameraPositionBestFract - normalOffset * 0.1, normalOffset));
-    normalOffsetDist += 0.04; // Fixes remaining artifacts. 0.03 is enough but use slightly higher to make sure
-    playerPos += normalOffsetDist * normalOffset;
+    if (!isTranslucent && z0 > 0.56) {
+        // Fix self-reflection and also align non-full blocks' trace start position to the grid
+        vec3 absWorldNormal = abs(worldNormal);
+        vec3 worldNormalM = vec3(equal(absWorldNormal, vec3(maxOf(abs(worldNormal))))) * sign(worldNormal);
 
-    vec3 voxelPos = playerToSceneVoxel(playerPos);
+        float normalOffsetDist = 1.0 - fract(dot(playerPos + cameraPositionBestFract - worldNormal * 0.1, worldNormalM));
+    }
+
+    playerPos += normalOffsetDist * worldNormal;
+
     vec3 rayDir = mat3(gbufferModelViewInverse) * nViewPosR;
+    vec3 voxelPos = playerToSceneVoxel(playerPos);
 
     if (CheckInsideSceneVoxelVolume(voxelPos)) {
         vec4 wsrResult = voxelRayTrace(playerPos, voxelPos, rayDir, RVdotU, RVdotS, dither, wsrTraceLength);
@@ -328,7 +334,7 @@ vec4 getWSR(vec3 playerPos, vec3 normalMR, vec3 nViewPosR, float RVdotU, float R
 
                     vec3 fadeout = smoothstep(0.0, 32.0, 0.5 * sceneVoxelVolumeSize - abs(playerPos));
                     float alphaFade = sqrt3(minOf(fadeout)) * 0.9 + 0.1;
-                    
+
                     return vec4(albedo * lighting, alphaFade);
                 }
             }

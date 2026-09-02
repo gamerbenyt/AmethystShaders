@@ -132,7 +132,7 @@ uniform vec3 previousCameraPositionFract;
     uniform mat4 dhProjection;
     uniform mat4 dhProjectionInverse;
     uniform mat4 dhPreviousProjection;
-    
+
     uniform sampler2D dhDepthTex;
     uniform sampler2D dhDepthTex1;
 #endif
@@ -204,3 +204,4 @@ uniform float inNetherWastes;
 uniform float inSoulValley;
 uniform float inWarpedForest;
 uniform float inPaleGarden;
+uniform float inSulfurCaves;

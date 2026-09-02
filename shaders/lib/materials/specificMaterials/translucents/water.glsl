@@ -46,31 +46,29 @@
 
 #if defined GBUFFERS_WATER || defined DH_WATER || defined VOXY_PATCH
     lmCoordM.y = min(lmCoord.y * 1.07, 1.0); // Iris/Sodium skylight inconsistency workaround
-    
+
     float fresnel2 = pow2(fresnel);
     float fresnel4 = pow2(fresnel2);
 
     // ============================== Step 2: Water Normals ============================== //
     reflectMult = 1.0;
 
-    #if WATER_MAT_QUALITY >= 3
+    #define WATER_SPEED_MULT_M WATER_SPEED_MULT * 0.018
+    float rawWind = frameTimeCounter * WATER_SPEED_MULT_M;
+    vec2 wind = vec2(0.0, -rawWind);
+    vec3 worldPos = playerPos + cameraPosition;
+    vec2 waterPos = worldPos.xz;
+    #if WATER_STYLE < 3 && defined GBUFFERS_WATER
+        float blockRes = absMidCoordPos.x * atlasSize.x * 2.0;
+        waterPos = floor(waterPos * blockRes) / blockRes;
+    #endif
+    waterPos = 0.032 * (waterPos + worldPos.y * 2.0);
+
+    #ifdef WATER_REFRACTION
         materialMask = OSIEBCA * 241.0; // Water
     #endif
 
-    #if WATER_MAT_QUALITY >= 2 || WATER_STYLE >= 2
-        #define WATER_SPEED_MULT_M WATER_SPEED_MULT * 0.018
-        float rawWind = frameTimeCounter * WATER_SPEED_MULT_M;
-        vec2 wind = vec2(0.0, -rawWind);
-        vec3 worldPos = playerPos + cameraPosition;
-        vec2 waterPos = worldPos.xz;
-        #if WATER_STYLE < 3 && defined GBUFFERS_WATER
-            float blockRes = absMidCoordPos.x * atlasSize.x * 2.0;
-            waterPos = floor(waterPos * blockRes) / blockRes;
-        #endif
-        waterPos = 0.032 * (waterPos + worldPos.y * 2.0);
-    #endif
-
-    #if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && WATER_MAT_QUALITY >= 2
+    #if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && !defined LOW_QUALITY_WATER_MATERIAL
         vec3 normalMap = vec3(0.0, 0.0, 1.0);
         #if WATER_STYLE >= 2
             vec2 waterPosM = waterPos;
@@ -85,7 +83,7 @@
             #if WATER_STYLE >= 2
                 waterPosM *= 2.5; wind *= 2.5;
 
-                #if WATER_MAT_QUALITY >= 2 && defined GBUFFERS_WATER
+                #if !defined LOW_QUALITY_WATER_MATERIAL && defined GBUFFERS_WATER
                     vec2 parallaxMult = -0.01 * viewVector.xy / viewVector.z;
                     for (int i = 0; i < 4; i++) {
                         waterPosM += parallaxMult * texture2D(gaux4, waterPosM - wind).a;
@@ -138,7 +136,7 @@
     // ============================== End of Step 2 ============================== //
 
     // ============================== Step 3: Water Material Features ============================== //
-    #if WATER_MAT_QUALITY >= 2
+    #if !defined LOW_QUALITY_WATER_MATERIAL
         if (isEyeInWater != 1) {
             // Noise Coloring //
             float noise = texture2DLod(noisetex, (waterPos + wind) * 0.25, 0.0).g;
@@ -278,7 +276,7 @@
 
     color.a = mix(color.a, 1.0, fresnel4);
 
-    
+
     #if WATER_STYLE == 3 || WATER_STYLE == 2 && SUN_MOON_STYLE >= 2
         smoothnessG = 1.0;
 

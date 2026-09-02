@@ -19,21 +19,20 @@
     const float shadowDistance = 192.0; //[64.0 80.0 96.0 112.0 128.0 160.0 192.0 224.0 256.0 320.0 384.0 512.0 768.0 1024.0]
     #define SSAO_QUALI_DEFINE 2 //[0 2 3]
     #define FXAA_DEFINE 1 //[-1 1]
-    #define DETAIL_QUALITY 2 //[0 2 3]
+    #define DETAIL_QUALITY 2 //[0 2 3 4]
     #define CLOUD_QUALITY 2 //[0 1 2 3]
     #define LIGHTSHAFT_QUALI_DEFINE 2 //[0 1 2 3 4]
     #define WATER_REFLECT_QUALITY 2 //[-1 0 1 2]
     #define BLOCK_REFLECT_QUALITY 3 //[0 1 3]
     #define ANISOTROPIC_FILTER 0 //[0 4 8 16]
     #define ENTITY_SHADOW 1 //[-1 1 2]
+    #define RAIN_PUDDLES 0 //[0 1 2 3 4]
 
     #define COLORED_LIGHTING 0 //[128 192 256 384 512 768 1024]
     #define WORLD_SPACE_REFLECTIONS -1 //[-1 1]
     #if defined IRIS_FEATURE_CUSTOM_IMAGES && SHADOW_QUALITY > -1 && !defined MC_OS_MAC && !(defined DH_TERRAIN || defined DH_WATER || defined VOXY_PATCH)
         #define COLORED_LIGHTING_INTERNAL COLORED_LIGHTING
         #if COLORED_LIGHTING_INTERNAL > 0
-            #define COLORED_LIGHT_SATURATION 100 //[50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 125]
-
             #define COLORED_LIGHT_FOG
             #define COLORED_LIGHT_FOG_I 0.65 //[0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50]
 
@@ -45,7 +44,7 @@
             #endif
             #define WORLD_SPACE_REF_MODE 2 //[1 2]
             //#define VISUALIZE_WORLD_SPACE_REF
-            
+
             #define PORTAL_EDGE_EFFECT
             #ifndef IRIS_HAS_CONNECTED_TEXTURES
                 #define CONNECTED_GLASS_EFFECT
@@ -58,6 +57,9 @@
         #define COLORED_LIGHTING_INTERNAL 0
         #define WORLD_SPACE_REFLECTIONS_INTERNAL -1
     #endif
+
+    #define LEAF_SHADOW_OPTIMISATION_DEFINE -1 //[-1 0 1]
+    #define SKY_EFFECT_REFLECTION_DEFINE -1 //[-1 0 1 2]
 
     #define WATER_STYLE_DEFINE -1 //[-1 1 2 3]
     #define WATER_CAUSTIC_STYLE_DEFINE -1 //[-1 1 3]
@@ -81,7 +83,6 @@
     #define WATER_SIZE_MULT 100 //[25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200 220 240 260 280 300]
 
     #define SHADOW_SMOOTHING 4 //[1 2 3 4]
-    #define RAIN_PUDDLES 0 //[0 1 2 3 4]
     #define SSAO_I 100 //[0 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200 220 240 260 280 300]
     #define VANILLAAO_I 100 //[0 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200 220 240 260 280 300]
 
@@ -133,7 +134,8 @@
     #define ATM_FOG_ALTITUDE 63 //[0 5 10 15 20 25 30 35 40 45 50 52 54 56 58 60 61 62 63 64 65 66 67 68 69 70 72 74 76 78 80 85 90 95 100 105 110 115 120 125 130 135 140 145 150 155 160 165 170 175 180 185 190 195 200 210 220 230 240 250 260 270 280 290 300]
     #define CAVE_FOG
     #define LIGHTSHAFT_BEHAVIOUR 1 //[0 1 2 3]
-    #define LIGHTSHAFT_DAY_I 100 //[1 3 5 7 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200]
+    #define LIGHTSHAFT_NOON_I 100 //[1 3 5 7 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200]
+    #define LIGHTSHAFT_SUNSET_I 100 //[1 3 5 7 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200]
     #define LIGHTSHAFT_NIGHT_I 100 //[1 3 5 7 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200]
     #define LIGHTSHAFT_RAIN_I 100 //[1 3 5 7 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 110 120 130 140 150 160 170 180 190 200]
     //#define LIGHTSHAFT_SMOKE
@@ -148,11 +150,11 @@
     #define VIGNETTE_R
     #define CHROMA_ABERRATION 0 //[0 1 2 3 4 5 6 7 8]
     #define UNDERWATER_DISTORTION
-    #define LENSFLARE_MODE 0 //[0 1 2]
+    #define LENSFLARE_MODE 0 //[0 1 2 3 4]
     #define LENSFLARE_I 1.00 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.10 1.20 1.30 1.40 1.50 1.60 1.70 1.80 1.90 2.00 2.20 2.40 2.60 2.80 3.00 3.25 3.50 3.75 4.00 4.25 4.50 4.75 5.00]
     #define DISTANT_LIGHT_BOKEH
 
-    #define TAA_MODE 1 //[0 1]
+    #define TAA_DEFINE -1 //[-1 0 1]
     #define TAA_SMOOTHING 3 //[2 3 4]
     #define TAA_JITTER 1 //[0 1 2 3]
     #define TAA_MOVEMENT_IMPROVEMENT_FILTER 1 //[0 1]
@@ -201,6 +203,8 @@
     //#define GLOWING_ARMOR_TRIM
 
     #define IPBR_EMISSIVE_MODE 1 //[1 3 2]
+    #define MIRROR_TINTED_GLASS 0 //[0 35 70 100]
+    #define HIDE_ARMOR 0 //[0 1 2]
     //#define IPBR_COMPAT_MODE_DEFINE
     #ifdef IPBR_COMPAT_MODE_DEFINE
         #define IPBR_COMPAT_MODE
@@ -349,6 +353,9 @@
     #define XLIGHT_I 1.00 //[0.01 0.03 0.05 0.07 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.10 1.20 1.30 1.40 1.50 1.60 1.70 1.80 1.90 2.00]
     #define XLIGHT_CURVE 1.00 //[0.20 0.25 0.30 0.40 0.50 0.60 0.70 0.80 0.90 1.00 1.10 1.20 1.30 1.40 1.50 1.60 1.80 2.00 2.20 2.40 2.60 2.80 3.00]
 
+    #define COLORED_LIGHT_SATURATION 100 //[50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 125]
+    #define ACT_FIRE_COLOR_WARMNESS 100 //[0 4 8 12 16 20 22 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180 184 188 192 196 200]
+
     #define IMPROVED_RAIN_DEFINE 1 //[0 1]
 
 //Internal Settings//
@@ -366,7 +373,9 @@
     #define FLICKERING_FIX
     //#define SAFER_GENERATED_NORMALS
 
-    #define SHADOW_FRUSTUM_FIT
+    #if MC_VERSION >= 260200
+        #define SULFUR_CAVE_FOG
+    #endif
 
 //Extensions//
 
@@ -390,10 +399,8 @@
         #define MORE_REFLECTIVE_DISTANT_GLASS
         //#define GENERATED_NORMALS
         //#define COATED_TEXTURES
-        //#define FANCY_GLASS
+        #define FANCY_GLASS
         //#define GREEN_SCREEN_LIME
-        //#define MIRROR_TINTED_GLASS
-        #define HIDE_ARMOR 0 //[0 1 2]
     #endif
     #if RP_MODE >= 2
         #define CUSTOM_PBR
@@ -514,28 +521,39 @@
         #define PBR_REFLECTIONS
     #endif
 
-    #if DETAIL_QUALITY == 0 // Potato
+    #if TAA_DEFINE == 1
+        #define TAA
+    #endif
+    #if LEAF_SHADOW_OPTIMISATION_DEFINE == 1
         #define LEAF_SHADOW_OPTIMISATION
+    #endif
+    #if SKY_EFFECT_REFLECTION_DEFINE >= 1
+        #define SKY_EFFECT_REFLECTION_TRANSLUCENT
+        #if SKY_EFFECT_REFLECTION_DEFINE == 2
+            #define SKY_EFFECT_REFLECTION_OPAQUE
+        #endif
+    #endif
+
+    #if DETAIL_QUALITY == 0 // Potato
+        #if LEAF_SHADOW_OPTIMISATION_DEFINE == -1
+            #define LEAF_SHADOW_OPTIMISATION
+        #endif
         #undef PERPENDICULAR_TWEAKS
         #define LOW_QUALITY_NETHER_STORM
         #define LOW_QUALITY_MOTION_BLUR
-        #define WATER_MAT_QUALITY 1
-    #endif
-    #if DETAIL_QUALITY >= 1 // not an option for now
-        #if TAA_MODE >= 1
-            #define TAA
-        #endif
-        #define WATER_MAT_QUALITY 1
+        #define LOW_QUALITY_WATER_MATERIAL
     #endif
     #if DETAIL_QUALITY >= 2 // Medium
-        #undef WATER_MAT_QUALITY
-        #define WATER_MAT_QUALITY 2
+        #if TAA_DEFINE == -1
+            #define TAA
+        #endif
     #endif
     #if DETAIL_QUALITY >= 3 // High
-        #undef WATER_MAT_QUALITY
-        #define WATER_MAT_QUALITY 3 // we use DETAIL_QUALITY >= 3 when writing in gbuffers_water because optifine bad
+        #if SKY_EFFECT_REFLECTION_DEFINE == -1
+            #define SKY_EFFECT_REFLECTION_TRANSLUCENT
+        #endif
+        #define WATER_REFRACTION
         #define HQ_NIGHT_NEBULA
-        #define SKY_EFFECT_REFLECTION
         #define CONNECTED_GLASS_CORNER_FIX
         #define ACT_CORNER_LEAK_FIX
         #define DO_NETHER_VINE_WAVING_OUTSIDE_NETHER
@@ -546,12 +564,14 @@
         #if CLOUD_QUALITY >= 3 && CLOUD_STYLE > 0 && CLOUD_STYLE != 50
             #define ENTITY_TAA_NOISY_CLOUD_FIX
         #endif
-        #if BLOOM_ENABLED == 1 && MOTION_BLUR_EFFECT == 1
-            #define MOTION_BLUR_BLOOM_FOG_FIX
-        #endif
     #endif
-    #if DETAIL_QUALITY >= 4 // Not an option yet
+    #if DETAIL_QUALITY >= 4 // Ultra
+        #if SKY_EFFECT_REFLECTION_DEFINE == -1
+            #define SKY_EFFECT_REFLECTION_OPAQUE
+        #endif
         #define REFLECTION_BLUR_DEPTH_CHECK
+        #define ACT_CORNER_LEAK_FIX_FOR_WSR
+        #define ANISOTROPIC_FILTER_ON_TRANSLUCENTS
     #endif
 
 //Define Handling//
@@ -580,6 +600,10 @@
     #endif
     #ifdef END
         #undef BLOOM_FOG
+    #endif
+
+    #if BLOOM_ENABLED == 1 && MOTION_BLUR_EFFECT == 1 && !defined LOW_QUALITY_MOTION_BLUR
+        #define MOTION_BLUR_BLOOM_FOG_FIX
     #endif
 
     #if BLOOM_ENABLED == -1
@@ -748,11 +772,16 @@
 
     const vec3 caveFogColorRaw = vec3(0.13, 0.13, 0.15);
     #if CAVE_LIGHTING < 100
-        vec3 caveFogColor = caveFogColorRaw * 0.7;
+        vec3 caveFogColorRaw2 = caveFogColorRaw * 0.7;
     #elif CAVE_LIGHTING == 100
-        vec3 caveFogColor = caveFogColorRaw * (0.7 + 0.3 * vsBrightness); // Default
+        vec3 caveFogColorRaw2 = caveFogColorRaw * (0.7 + 0.3 * vsBrightness); // Default
     #elif CAVE_LIGHTING > 100
-        vec3 caveFogColor = caveFogColorRaw;
+        vec3 caveFogColorRaw2 = caveFogColorRaw;
+    #endif
+    #ifdef SULFUR_CAVE_FOG
+        vec3 caveFogColor = mix(caveFogColorRaw2, vec3(0.22, 0.25, 0.1), inSulfurCaves);
+    #else
+        vec3 caveFogColor = caveFogColorRaw2;
     #endif
 
     #if WATERCOLOR_MODE >= 2
@@ -831,7 +860,7 @@
             230 to 240: Consistent metalness with still increasing f0
     241 to 255 - PBR Independant:
         OSIEBCA * 241.0 = Water
-    
+
         OSIEBCA * 251.0 = No SSAO, Reduce Reflection
         OSIEBCA * 252.0 = Versatile Selection Outline
         OSIEBCA * 253.0 = Reduced Edge TAA (Leaves)

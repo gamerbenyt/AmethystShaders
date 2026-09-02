@@ -89,9 +89,9 @@ void main() {
     bool noSmoothLighting = false, noDirectionalShading = false, noVanillaAO = false, centerShadowBias = false;
     int subsurfaceMode = 0;
     float smoothnessG = 0.0, smoothnessD = 0.0, highlightMult = 1.0, emission = 0.0, snowFactor = 1.0, snowMinNdotU = 0.0;
-    vec3 normalM = normal, geoNormal = normal, shadowMult = vec3(1.0);    
+    vec3 normalM = normal, geoNormal = normal, shadowMult = vec3(1.0);
     vec3 worldGeoNormal = normalize(ViewToPlayer(geoNormal * 10000.0));
-    
+
     if (mat == DH_BLOCK_LEAVES) {
         #include "/lib/materials/specificMaterials/terrain/leaves.glsl"
     } else if (mat == DH_BLOCK_GRASS) {
@@ -121,7 +121,7 @@ void main() {
     DoLighting(color, shadowMult, playerPos, viewPos, lViewPos, geoNormal, normalM, 0.5,
                worldGeoNormal, lmCoordM, noSmoothLighting, noDirectionalShading, noVanillaAO,
                centerShadowBias, subsurfaceMode, smoothnessG, highlightMult, emission);
-               
+
     /* DRAWBUFFERS:0 */
     gl_FragData[0] = color;
 }
@@ -164,7 +164,7 @@ void main() {
     mat = dhMaterialId;
 
     lmCoord  = GetLightMapCoordinates();
-    
+
     normal = normalize(gl_NormalMatrix * gl_Normal);
     upVec = normalize(gbufferModelView[1].xyz);
     eastVec = normalize(gbufferModelView[0].xyz);

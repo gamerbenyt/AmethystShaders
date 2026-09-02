@@ -29,7 +29,9 @@ vec2 view = vec2(viewWidth, viewHeight);
 #endif
 
 #if COLORED_LIGHTING > 0
-    #define COORDINATES_ACT_ERROR
+    #if IRIS_VERSION < 11103 && !defined EUPHORIA_PATCHES_AT_MIDBLOCK_FIX
+        #define COORDINATES_ACT_ERROR
+    #endif
     #define SHADOWDISTANCE_ACT_ERROR
 #endif
 
