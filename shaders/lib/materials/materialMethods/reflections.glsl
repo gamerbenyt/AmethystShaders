@@ -197,7 +197,8 @@ vec4 GetReflection(inout vec3 normalM, vec3 viewPos, vec3 nViewPos, vec3 playerP
                         if (z0 <= 0.56) lod *= 2.22; // Using more lod to compensate for less roughness noise on held items
                         lod = max(lod - 1.0, 0.0);
 
-                        reflection.rgb = texture2DLod(colortex0, refPos.xy, lod).rgb;
+                        reflection.rgb = texture2DLod(colortex5, refPos.xy, lod).rgb;
+                        reflection.rgb = pow2(reflection.rgb * 2.0);
                     #endif
 
                     float skyFade = 0.0;

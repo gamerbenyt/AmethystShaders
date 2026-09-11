@@ -201,6 +201,9 @@
             #if WATER_ALPHA_MULT != 100
                 #define WATER_ALPHA_MULT_M 100.0 / WATER_ALPHA_MULT
                 color.a = pow(color.a, WATER_ALPHA_MULT_M);
+                #if WATER_ALPHA_MULT > 100
+                    translucentMult.rgb *= pow2(WATER_ALPHA_MULT_M);
+                #endif
             #endif
             ////
 

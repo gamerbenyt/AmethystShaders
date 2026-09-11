@@ -166,6 +166,7 @@ void main() {
                false, 0, smoothnessG, highlightMult, emission);
 
     vec3 translucentMult = mix(vec3(0.666), color.rgb * (1.0 - pow2(pow2(color.a))), color.a);
+    translucentMult.rgb = mix(translucentMult.rgb, vec3(1.0), min1(lViewPos / 50.0));
     float skyLightFactor = GetSkyLightFactor(lmCoordM, shadowMult);
 
     #ifdef COLOR_CODED_PROGRAMS
@@ -179,6 +180,11 @@ void main() {
         float dither = Bayer64(gl_FragCoord.xy);
         #ifdef TAA
             dither = fract(dither + goldenRatio * mod(float(frameCounter), 3600.0));
+        #endif
+
+        #ifdef ATM_COLOR_MULTS
+            atmColorMult = GetAtmColorMult();
+            sqrtAtmColorMult = sqrt(atmColorMult);
         #endif
 
         float skyFade = 0.0;

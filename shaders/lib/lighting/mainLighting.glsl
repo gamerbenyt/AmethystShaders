@@ -296,9 +296,9 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
                     }
                 }
             #else
-                #if SHADOW_QUALITY == -1 || !defined VOXY_PATCH
-                    shadowMult *= skyLightShadowMult;
-                #else
+                shadowMult *= skyLightShadowMult;
+
+                #if SHADOW_QUALITY > -1 && defined VOXY_OPAQUE
                     // Screenspace shadows rendered in deferred1 of previous frame for Voxy
                     // Previous frame reprojection from Chocapic13
                     vec3 screenSpaceShadowPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
@@ -327,9 +327,7 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
 
                             shadowMult *= mix(baseLeafShadowMult, NdotU, extraLeafShadeMix);
                         }
-                        shadowMult *= screenSpaceShadowSample * skyLightShadowMult;
-                    } else {
-                        shadowMult *= skyLightShadowMult;
+                        shadowMult *= screenSpaceShadowSample;
                     }
                 #endif
             #endif
@@ -465,7 +463,7 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
         #endif
 
         if (isEyeInWater != 1) {
-            float lxFactor = (sunVisibility2 * 0.4 + (0.6 - 0.6 * pow2(invNoonFactor))) * (6.0 - 5.0 * rainFactor);
+            float lxFactor = (sunVisibility2 * 0.4 + (0.6 - 0.6 * invNoonFactor2)) * (6.0 - 5.0 * rainFactor);
             lxFactor *= lightmapY2 + lightmapY2 * 2.0 * pow2(shadowMultFloat);
             lxFactor = max0(lxFactor - emission * 1000000.0);
             blockLighting *= pow(lightmapXM / 60.0 + 0.001, 0.09 * lxFactor);

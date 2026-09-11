@@ -147,11 +147,11 @@ float GetLinearDepth(float depth, float far, float near) {
                 if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0) break;
 
                 #ifdef VOXY
-                    traceZ = texture2D(depthtex0, pos.xy).r;
+                    // traceZ = texture2D(depthtex0, pos.xy).r;
 
-                    if (traceZ < 1.0) {
-                        zDelta = -tracePos.z - GetLinearDepth(traceZ, gbufferProjectionInverse);
-                    } else
+                    // if (traceZ < 1.0) {
+                    //     zDelta = -tracePos.z - GetLinearDepth(traceZ, gbufferProjectionInverse);
+                    // } else
                 #endif
                 {
                     traceZ = texture2D(depthtex, pos.xy).r;

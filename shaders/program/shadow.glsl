@@ -318,10 +318,8 @@ void main() {
                 vec2 midCoord = (gl_TextureMatrix[0] * mc_midTexCoord).st;
                 vec2 texMinMidCoord = texCoord - midCoord;
             #endif
-            if (texMinMidCoord.y < 0.0) {
-                vec3 normal = gl_NormalMatrix * gl_Normal;
-                position.xyz += normal * 0.35;
-            }
+            vec3 normal = gl_NormalMatrix * gl_Normal;
+            position.xyz += normal * sign(texMinMidCoord.y) * 0.2 * noonFactor * (1.0 + 0.01 * length(position.xyz));
         }
     #endif
 

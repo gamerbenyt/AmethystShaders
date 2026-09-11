@@ -737,8 +737,9 @@
     #endif
 
     const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
-    float noonFactor = sqrt(max(sin(timeAngle*6.28318530718),0.0));
-    float nightFactor = max(sin(timeAngle*(-6.28318530718)),0.0);
+    float noonFactorRaw = max(sin(timeAngle * 6.28318530718), 0.0);
+    float noonFactor = sqrt(noonFactorRaw);
+    float nightFactor = max(sin(timeAngle * (-6.28318530718)), 0.0);
     float invNightFactor = 1.0 - nightFactor;
     float rainFactor2 = rainFactor * rainFactor;
     float invRainFactor = 1.0 - rainFactor;

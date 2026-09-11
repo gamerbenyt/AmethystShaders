@@ -207,8 +207,8 @@ void main() {
 
     float smoothnessD = 0.0, materialMask = 0.0;
 
-    #if !defined POM || !defined POM_ALLOW_CUTOUT
-        if (color.a <= 0.00001) discard; // 6WIR4HT23
+    #if !defined POM || !defined POM_ALLOW_CUTOUT // 6WIR4HT23
+        if (color.a <= 0.5) discard;
     #endif
 
     vec3 colorP = color.rgb;

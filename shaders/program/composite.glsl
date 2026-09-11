@@ -17,6 +17,7 @@ in vec3 sunVec;
 #endif
 
 //Pipeline Constants//
+const bool colortex5MipmapEnabled = true;
 
 //Common Variables//
 vec3 upVec = normalize(gbufferModelView[1].xyz);

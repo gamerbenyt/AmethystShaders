@@ -33,6 +33,8 @@
 //Includes//
 #if CLOUD_STYLE_DEFINE == 50
     #include "/lib/colors/skyColors.glsl"
+    #include "/lib/colors/lightAndAmbientColors.glsl"
+    #include "/lib/colors/cloudColors.glsl"
     #include "/lib/util/spaceConversion.glsl"
 
     #if defined TAA && (defined BORDER_FOG || defined VOXY)
@@ -58,23 +60,25 @@ void main() {
     #else
         vec4 color = texture2D(tex, texCoord) * vec4(vec3(1.0), glColor.a);
 
-        color.rgb *= 0.9 + 0.25 * dot(upVec, normal) - 0.1 * abs(dot(northVec, normal)) - rainFactor * 0.2;
+        color.rgb *= 1.0 + 0.15 * dot(upVec, normal) - 0.1 * abs(dot(northVec, normal)) - rainFactor * 0.2;
 
         vec4 translucentMult = vec4(mix(vec3(0.666), color.rgb * (1.0 - pow2(pow2(color.a))), color.a), 1.0);
 
         #ifdef OVERWORLD
-            vec3 cloudLight = mix(vec3(0.8, 1.6, 1.5) * sqrt1(nightFactor), mix(dayDownSkyColor, dayMiddleSkyColor, 0.1), sunFactor);
-            color.rgb *= sqrt(cloudLight) * (1.2 + 0.4 * noonFactor * invRainFactor);
+            float NdotU = dot(upVec, normal);
 
-            #if CLOUD_R != 100 || CLOUD_G != 100 || CLOUD_B != 100
-                color.rgb *= vec3(CLOUD_R, CLOUD_G, CLOUD_B) * 0.01;
-            #endif
+            color.rgb *= cloudLightColor * (min1(NdotU + 1.0) * 0.15 + 0.15) + 1.25 * cloudAmbientColor;
+
             #ifdef ATM_COLOR_MULTS
                 color.rgb *= sqrt(GetAtmColorMult()); // C72380KD - Reduced atmColorMult impact on things
             #endif
             #ifdef MOON_PHASE_INF_ATMOSPHERE
                 color.rgb *= moonPhaseInfluence;
             #endif
+        #endif
+
+        #if CLOUD_R != 100 || CLOUD_G != 100 || CLOUD_B != 100
+            color.rgb *= vec3(CLOUD_R, CLOUD_G, CLOUD_B) * 0.01;
         #endif
 
         #if defined BORDER_FOG || defined VOXY

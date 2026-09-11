@@ -340,7 +340,7 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
 // ============================== Step 5: Final Tweaks ============================== //
     #ifdef OVERWORLD
         vlColor = pow(vlColor, vec3(0.5 + (0.5 + LIGHTSHAFT_SUNSET_SATURATION * sunVisibility) * invNoonFactor * invRainFactor + 0.3 * rainFactor));
-        vlColor *= 1.0 - (0.3 + 0.3 * noonFactor) * rainFactor - 0.5 * rainyNight + sunVisibility * pow2(invNoonFactor) * invRainFactor;
+        vlColor *= 1.0 - (0.3 + 0.3 * noonFactor) * rainFactor - 0.5 * rainyNight + sunVisibility * invNoonFactor2 * invRainFactor;
 
         #if LIGHTSHAFT_NOON_I != 100 || LIGHTSHAFT_SUNSET_I != 100 || LIGHTSHAFT_NIGHT_I != 100 || LIGHTSHAFT_RAIN_I != 100
             #define LIGHTSHAFT_NOON_IM LIGHTSHAFT_NOON_I * 0.01

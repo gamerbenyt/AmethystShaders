@@ -80,6 +80,7 @@
         "rainStrength",
         "eyeBrightness",
         "eyeBrightnessM",
+        "eyeBrightnessM2",
         "maxBlindnessDarkness",
         "near",
         "frameTimeCounter",
