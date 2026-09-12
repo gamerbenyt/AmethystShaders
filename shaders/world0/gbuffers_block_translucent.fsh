@@ -3,6 +3,6 @@
 #define FRAGMENT_SHADER
 #define OVERWORLD
 #define GBUFFERS_BLOCK
-#define a123
+#define GBUFFERS_BLOCK_TRANSLUCENT
 
 #include "/program/gbuffers_block.glsl"

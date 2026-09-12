@@ -74,7 +74,7 @@ float GetLinearDepth(float depth) {
     #include "/lib/atmospherics/volumetricLight/volumetricLight.glsl"
 #endif
 
-#if WATER_MAT_QUALITY >= 3
+#ifdef WATER_REFRACTION
     #include "/lib/materials/materialMethods/refraction.glsl"
 #endif
 
@@ -108,6 +108,7 @@ void main() {
     vec4 viewPos = gbufferProjectionInverse * (screenPos * 2.0 - 1.0);
     viewPos /= viewPos.w;
     float lViewPos = length(viewPos.xyz);
+    vec3 nViewPos = normalize(viewPos.xyz);
 
     #if defined DISTANT_HORIZONS || defined VOXY
         #ifdef DISTANT_HORIZONS
@@ -134,7 +135,7 @@ void main() {
     vec4 volumetricEffect = vec4(0.0);
 
     vec2 texCoordM = texCoord;
-    #if WATER_MAT_QUALITY >= 3 && defined ALLOW_REFRACTION
+    #if defined WATER_REFRACTION && defined ALLOW_REFRACTION
         texCoordM = DoRefraction(color, z0, z1, viewPos.xyz, lViewPos);
     #endif
 
@@ -160,14 +161,19 @@ void main() {
             #endif
 
             float fresnelM = pow2(texture2D(colortex4, texCoord).a); // including attenuation through fog and clouds
+
+            #if defined DISTANT_HORIZONS || defined VOXY
+                fresnelM *= 1.0 - smoothstep(0.8, 1.05, lViewPos / far);
+            #endif
+
             if (abs(fresnelM - 0.5) < 0.5) { // 0.0 fresnel doesnt need ref calculations, and 1.0 fresnel basically means error
                 if (z0 == z1 || z0 <= 0.56) { // Solids
                     #ifdef PBR_REFLECTIONS
                         if (fresnelM > 0.00001) {
-                            compositeReflection = sampleBlurFilteredReflection(compositeReflection, dither, z0);
+                            compositeReflection = sampleBlurFilteredReflection(compositeReflection, nViewPos, dither, z0);
 
                             compositeReflection.rgb = max(compositeReflection.rgb, vec3(0.0)); // We seem to have some negative values for some reason
-                            
+
                             // This physically doesn't make sense but fits Minecraft
                             const float texturePreservation = 0.7;
                             compositeReflection.rgb = mix(compositeReflection.rgb, max(color, compositeReflection.rgb), texturePreservation);
@@ -213,7 +219,6 @@ void main() {
     #endif
 
     #if defined LIGHTSHAFTS_ACTIVE || RAINBOWS > 0 && defined OVERWORLD
-        vec3 nViewPos = normalize(viewPos1.xyz);
         float VdotL = dot(nViewPos, lightVec);
         float VdotU = dot(nViewPos, upVec);
     #endif
@@ -314,7 +319,7 @@ void main() {
 
     #ifdef LIGHTSHAFTS_ACTIVE
         #if defined END && defined TAA // Fix banding
-            volumetricEffect.rgb = max(vec3(0.0), volumetricEffect.rgb + (dither - 0.5) * 0.02);
+            volumetricEffect.rgb = max(vec3(0.0), volumetricEffect.rgb - dither * 0.005);
         #endif
         // We add volumetric effect AFTER the "pow color by 2.2" line to get nicer blending
         color += volumetricEffect.rgb;

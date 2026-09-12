@@ -118,11 +118,15 @@ float GetLinearDepth(float depth, float far, float near) {
             float shadow = 1.0;
             vec3 tracePos = viewPos.xyz;
             vec3 traceStep = normalize(lightVec) * 2.5;
-            
+
             #ifdef TAA
                 tracePos += traceStep * (fract(dither + frameCounter * 0.618) + 0.2);
             #else
                 tracePos += traceStep * (dither + 0.2);
+            #endif
+
+            #ifdef END
+                tracePos.xy += 5.0 * (dither - 0.5); // Blur to match end shadows
             #endif
 
             float traceZ = 0.0;
@@ -143,11 +147,11 @@ float GetLinearDepth(float depth, float far, float near) {
                 if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0) break;
 
                 #ifdef VOXY
-                    traceZ = texture2D(depthtex0, pos.xy).r;
-                    
-                    if (traceZ < 1.0) {
-                        zDelta = -tracePos.z - GetLinearDepth(traceZ, gbufferProjectionInverse);
-                    } else
+                    // traceZ = texture2D(depthtex0, pos.xy).r;
+
+                    // if (traceZ < 1.0) {
+                    //     zDelta = -tracePos.z - GetLinearDepth(traceZ, gbufferProjectionInverse);
+                    // } else
                 #endif
                 {
                     traceZ = texture2D(depthtex, pos.xy).r;
@@ -322,7 +326,7 @@ void main() {
             #elif defined VOXY
                 float z0lod = texelFetch(vxDepthTexTrans, texelCoord, 0).r;
             #endif
-            if (z0lod < 1.0) { // Lod Chunks
+            if (z0lod < 1.0 && z0lod > 0.0) { // Lod Chunks
                 vec4 screenPosLod = vec4(texCoord, z0lod, 1.0);
                 #ifdef DISTANT_HORIZONS
                     vec4 viewPosLod = dhProjectionInverse * (screenPosLod * 2.0 - 1.0);
@@ -341,17 +345,17 @@ void main() {
                     #endif
 
                     #if SSAO_QUALI > 0
-                        float farLod = 16*20, nearLod = 16;
+                        float farLod = 16*20, nearLod = 4;
                         float aoWorldRange = (farLod - nearLod);
                         float ssao = GetAmbientOcclusion(vxDepthTexTrans, z0lod, GetLinearDepth(z0lod, farLod, nearLod), dither, farLod, nearLod, aoWorldRange);
-                        color.rgb *= pow2(pow2(ssao));
+                        color.rgb *= pow3(ssao);
                     #endif
                 #endif
 
                 lViewPos = length(viewPosLod.xyz);
                 playerPos = ViewToPlayer(viewPosLod.xyz);
                 waterRefColor = color.rgb;
-                
+
                 DoFog(color, skyFade, lViewPos, playerPos, VdotU, VdotS, dither, false, 0.0);
             } else
         #endif
@@ -401,7 +405,7 @@ void main() {
         }
     #endif
 
-    #ifdef SKY_EFFECT_REFLECTION
+    #ifdef SKY_EFFECT_REFLECTION_TRANSLUCENT
         waterRefColor = mix(waterRefColor, clouds.rgb, clouds.a);
     #endif
     waterRefColor = sqrt(waterRefColor) * 0.5;

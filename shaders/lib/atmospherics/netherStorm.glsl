@@ -26,6 +26,7 @@ vec4 GetNetherStorm(vec3 color, vec3 translucentMult, vec3 nPlayerPos, vec3 play
     #endif
 
     vec3 translucentMultM = pow(translucentMult, vec3(1.0 / sampleCount));
+    float translucentMultM2 = GetLuminance(translucentMultM);
 
     for (int i = 0; i < sampleCount; i++) {
         tracePos += traceAdd;
@@ -56,7 +57,10 @@ vec4 GetNetherStorm(vec3 color, vec3 translucentMult, vec3 nPlayerPos, vec3 play
             wind *= -2.0;
         }
 
-        if (lTracePos > lViewPos) netherStorm.rgb *= translucentMultM;
+        if (lTracePos > lViewPos) {
+            netherStorm.rgb *= translucentMultM;
+            netherStorm.a *= translucentMultM2;
+        }
     }
 
     #ifdef LOW_QUALITY_NETHER_STORM

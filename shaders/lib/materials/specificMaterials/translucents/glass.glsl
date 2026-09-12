@@ -11,7 +11,7 @@ if (minAlpha > 0.001) {
 
     translucentMultCalculated = true;
     translucentMult = vec4(0.0, 0.0, 0.0, 1.0);
-} 
+}
 
 else {
     #ifdef FANCY_GLASS
@@ -26,6 +26,15 @@ else {
         color.a = max(color.a, GLASS_OPACITY);
 
         DoTranslucentTweaks(color, fresnelM, reflectMult, lViewPos);
+
+        #ifdef RAIN_PUDDLES
+            float dither = texture2DLod(noisetex, gl_FragCoord.xy / 128.0, 0.0).b;
+            #ifdef TAA
+                dither = fract(dither + goldenRatio * mod(float(frameCounter), 3600.0));
+            #endif
+
+            if (dither > max(eyeBrightnessM2, 1.0 - rainFactor)) discard;
+        #endif
     #else
         discard;
     #endif

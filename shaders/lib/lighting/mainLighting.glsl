@@ -213,10 +213,12 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
                             #endif
                             {
                                 float distanceBias = pow(dot(playerPos, playerPos), 0.75);
-                                distanceBias = 0.12 + 0.0008 * distanceBias;
-                                vec3 bias = worldGeoNormal * distanceBias * (2.0 - 0.95 * NdotLmax0); // 0.95 fixes pink petals noon shadows
+                                vec3 bias = worldGeoNormal * (0.12 + 0.0008 * distanceBias) * (2.0 - 0.95 * NdotLmax0); // 0.95 fixes pink petals noon shadows
 
                                 #ifdef GBUFFERS_TERRAIN
+                                    // WS752GH42G: "Water shadow outside water" fix. This calculation needs to be similar (but not the exact same) as water up-bias
+                                    bias.y += lightmapYM * (1.0 - abs(geoNdotU)) * 0.015 * max0(lViewPos - 40.0);
+
                                     if (subsurfaceMode == 2) {
                                         bias *= vec3(0.0, 0.0, -0.5);
                                         bias.z += 0.25 * signMidCoordPos.x * NdotE;
@@ -254,11 +256,11 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
                                         NdotLM = mix(NdotL, NdotLM, 0.5);
                                     #endif
                                 } else {
-                                    
+
                                 }
                             }
                         #endif
-                        
+
                         int shadowSampleBooster = int(subsurfaceMode > 0 && lViewPos < 10.0);
                         #if SHADOW_QUALITY == 2 // Medium
                             int shadowSamples = 2 + 2 * shadowSampleBooster;
@@ -294,15 +296,15 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
                     }
                 }
             #else
-                #if SHADOW_QUALITY == -1 || !defined VOXY_PATCH
-                    shadowMult *= skyLightShadowMult;
-                #else
+                shadowMult *= skyLightShadowMult;
+
+                #if SHADOW_QUALITY > -1 && defined VOXY_OPAQUE
                     // Screenspace shadows rendered in deferred1 of previous frame for Voxy
                     // Previous frame reprojection from Chocapic13
                     vec3 screenSpaceShadowPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
                     vec4 viewPosPrev = vxProjInv * vec4(screenSpaceShadowPos * 2.0 - 1.0, 1.0);
                     viewPosPrev /= viewPosPrev.w;
-                    
+
                     viewPosPrev = vxModelViewInv * viewPosPrev;
 
                     vec4 previousPosition = viewPosPrev + vec4(cameraPosition - previousCameraPosition, 0.0);
@@ -315,7 +317,7 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
                         if (subsurfaceMode == 1) {
                             shadowMult *= 0.82 * (0.2 + 0.8 * sqrt2(max(SdotU, nightFactor)));
                         } else if (subsurfaceMode == 2) {
-                            float baseLeafShadowMult = 1.0; 
+                            float baseLeafShadowMult = 1.0;
 
                             #ifdef LEAF_SHADOW_OPTIMISATION
                                 float extraLeafShadeMix = 0.25 + 0.125 * pow2(noonFactor);
@@ -325,9 +327,7 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
 
                             shadowMult *= mix(baseLeafShadowMult, NdotU, extraLeafShadeMix);
                         }
-                        shadowMult *= screenSpaceShadowSample * skyLightShadowMult;
-                    } else {
-                        shadowMult *= skyLightShadowMult;
+                        shadowMult *= screenSpaceShadowSample;
                     }
                 #endif
             #endif
@@ -463,7 +463,7 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
         #endif
 
         if (isEyeInWater != 1) {
-            float lxFactor = (sunVisibility2 * 0.4 + (0.6 - 0.6 * pow2(invNoonFactor))) * (6.0 - 5.0 * rainFactor);
+            float lxFactor = (sunVisibility2 * 0.4 + (0.6 - 0.6 * invNoonFactor2)) * (6.0 - 5.0 * rainFactor);
             lxFactor *= lightmapY2 + lightmapY2 * 2.0 * pow2(shadowMultFloat);
             lxFactor = max0(lxFactor - emission * 1000000.0);
             blockLighting *= pow(lightmapXM / 60.0 + 0.001, 0.09 * lxFactor);

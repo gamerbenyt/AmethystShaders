@@ -59,19 +59,19 @@ bool CheckInsideLodVoxelVolume(vec3 voxelPos) {
             if (mat == 10129 // Farmland:Dry
                 || mat == 10137 // Farmland:Wet
                 || mat == 10493 // Dirt Path
-            ) { 
+            ) {
                 doSolidBlockCheck = false;
                 textureRad *= 0.5;
                 origin.y += 2.0 / atlasSize.y;
-            } 
+            }
 
             if (mat == 10068 // Lava
-            ) { 
+            ) {
                 if (abs(dot(textureRad, vec2(atlasSize.x, -atlasSize.y))) < 6.5)
                     storeToAllFaces = true;
                 else return;
             }
-            
+
             // Half blocks that we want to display as full blocks in reflections
             if (mat == 10035 // Stone Bricks, Mossy Stone Bricks
                 || abs(mat - 10095) <= 12 && mat % 4 == 3 // Stone, Smooth Stone, Granite, Diorite, Andesite, Bricks, Mud Bricks
@@ -191,37 +191,41 @@ bool CheckInsideLodVoxelVolume(vec3 voxelPos) {
 
 
         void UpdatePlayerVertexList(vec3 position) {
-            if (entityId == 50017 && textureSize(tex, 0) == ivec2(64) && gl_VertexID < 288) { // Current Player
+            int localVertexID = gl_VertexID % 288;
+            // This fixes the whole system being broken on MC 26.2 and above due to the batching system.
+            // Don't ask me how it even works, I don't know either. I just tried doing modulo by player vertex count
+
+            if (entityId == 50017 && textureSize(tex, 0) == ivec2(64)) { // Current Player
 
                 // The atlas takes 4 frames to fully generate, reload every 600 frames
-                if (framemod600 > 5 && framemod600 <= 9 && gl_VertexID < 256) {
-                    int i = gl_VertexID * 4 + int(framemod4) * 1024;
+                if (framemod600 > 5 && framemod600 <= 9 && localVertexID < 256) {
+                    int i = localVertexID * 4 + int(framemod4) * 1024;
                     for (int j = 0; j < 4; j++) {
                         ivec2 coord = ivec2((i + j) % 64, (i + j) / 64);
                         imageStore(playerAtlas_img, coord, texelFetch(tex, coord, 0));
                     }
                 }
 
-                position.xz -= 0.2 * playerLookVector.xz;
+                position -= 0.2 * playerLookVector;
 
                 ivec3 aabbPos = ivec3(position * 1000.0);
 
-                if (gl_VertexID < 48) { // Head
-                    updateAABB(playerVerticesSSBO.bounds.headMin, playerVerticesSSBO.bounds.headMax, aabbPos);
-                } else if (gl_VertexID < 96) { // Right Hand
-                    updateAABB(playerVerticesSSBO.bounds.rightHandMin, playerVerticesSSBO.bounds.rightHandMax, aabbPos);
-                } else if (gl_VertexID < 144) { // Left Leg
-                    updateAABB(playerVerticesSSBO.bounds.leftLegMin, playerVerticesSSBO.bounds.leftLegMax, aabbPos);
-                } else if (gl_VertexID < 192) { // Left Hand
-                    updateAABB(playerVerticesSSBO.bounds.leftHandMin, playerVerticesSSBO.bounds.leftHandMax, aabbPos);
-                } else if (gl_VertexID < 240) { // Right leg
-                    updateAABB(playerVerticesSSBO.bounds.rightLegMin, playerVerticesSSBO.bounds.rightLegMax, aabbPos);
+                if (localVertexID < 48) { // Head
+                    updateAABB(playerVerticesSSBO.headMin, playerVerticesSSBO.headMax, aabbPos);
+                } else if (localVertexID < 96) { // Right Hand
+                    updateAABB(playerVerticesSSBO.rightHandMin, playerVerticesSSBO.rightHandMax, aabbPos);
+                } else if (localVertexID < 144) { // Left Leg
+                    updateAABB(playerVerticesSSBO.leftLegMin, playerVerticesSSBO.leftLegMax, aabbPos);
+                } else if (localVertexID < 192) { // Left Hand
+                    updateAABB(playerVerticesSSBO.leftHandMin, playerVerticesSSBO.leftHandMax, aabbPos);
+                } else if (localVertexID < 240) { // Right leg
+                    updateAABB(playerVerticesSSBO.rightLegMin, playerVerticesSSBO.rightLegMax, aabbPos);
                 } else { // Torso
-                    updateAABB(playerVerticesSSBO.bounds.torsoMin, playerVerticesSSBO.bounds.torsoMax, aabbPos);
+                    updateAABB(playerVerticesSSBO.torsoMin, playerVerticesSSBO.torsoMax, aabbPos);
                 }
 
-                if (gl_VertexID % 4 != 3) {
-                    int ssboIndex = gl_VertexID - gl_VertexID / 4;
+                if (localVertexID % 4 != 3) {
+                    int ssboIndex = localVertexID - localVertexID / 4;
                     playerVerticesSSBO.vertexPositions[ssboIndex] = position;
                     playerVerticesSSBO.vertexData[ssboIndex] = texCoord;
                 }

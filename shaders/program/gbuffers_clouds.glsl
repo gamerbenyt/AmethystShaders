@@ -12,7 +12,8 @@
 // We use CLOUD_STYLE_DEFINE instead of CLOUD_STYLE in this file because Optifine can't use generated defines for pipeline stuff
     in vec2 texCoord;
 
-    flat in vec3 upVec, sunVec;
+    flat in vec3 upVec, sunVec, northVec;
+    in vec3 normal;
 
     in vec4 glColor;
 #endif
@@ -32,9 +33,11 @@
 //Includes//
 #if CLOUD_STYLE_DEFINE == 50
     #include "/lib/colors/skyColors.glsl"
+    #include "/lib/colors/lightAndAmbientColors.glsl"
+    #include "/lib/colors/cloudColors.glsl"
     #include "/lib/util/spaceConversion.glsl"
 
-    #if defined TAA && defined BORDER_FOG
+    #if defined TAA && (defined BORDER_FOG || defined VOXY)
         #include "/lib/antialiasing/jitter.glsl"
     #endif
 
@@ -55,23 +58,27 @@ void main() {
     #if CLOUD_STYLE_DEFINE != 50
         discard;
     #else
-        vec4 color = texture2D(tex, texCoord) * glColor;
+        vec4 color = texture2D(tex, texCoord) * vec4(vec3(1.0), glColor.a);
+
+        color.rgb *= 1.0 + 0.15 * dot(upVec, normal) - 0.1 * abs(dot(northVec, normal)) - rainFactor * 0.2;
 
         vec4 translucentMult = vec4(mix(vec3(0.666), color.rgb * (1.0 - pow2(pow2(color.a))), color.a), 1.0);
 
         #ifdef OVERWORLD
-            vec3 cloudLight = mix(vec3(0.8, 1.6, 1.5) * sqrt1(nightFactor), mix(dayDownSkyColor, dayMiddleSkyColor, 0.1), sunFactor);
-            color.rgb *= sqrt(cloudLight) * (1.2 + 0.4 * noonFactor * invRainFactor);
+            float NdotU = dot(upVec, normal);
 
-            #if CLOUD_R != 100 || CLOUD_G != 100 || CLOUD_B != 100
-                color.rgb *= vec3(CLOUD_R, CLOUD_G, CLOUD_B) * 0.01;
-            #endif
+            color.rgb *= cloudLightColor * (min1(NdotU + 1.0) * 0.15 + 0.15) + 1.25 * cloudAmbientColor;
+
             #ifdef ATM_COLOR_MULTS
                 color.rgb *= sqrt(GetAtmColorMult()); // C72380KD - Reduced atmColorMult impact on things
             #endif
             #ifdef MOON_PHASE_INF_ATMOSPHERE
                 color.rgb *= moonPhaseInfluence;
             #endif
+        #endif
+
+        #if CLOUD_R != 100 || CLOUD_G != 100 || CLOUD_B != 100
+            color.rgb *= vec3(CLOUD_R, CLOUD_G, CLOUD_B) * 0.01;
         #endif
 
         #if defined BORDER_FOG || defined VOXY
@@ -103,7 +110,14 @@ void main() {
                 #endif
 
                 cloudDistance = clamp((cloudDistance - xzMaxDistance) / cloudDistance, 0.0, 1.0);
-                color.a *= clamp01(cloudDistance * 3.0);
+
+                #if MC_VERSION < 12106
+                    cloudDistance *= 3.0;
+                #else
+                    cloudDistance *= 1.5;
+                #endif
+
+                color.a *= clamp01(cloudDistance);
             #endif
         #endif
 
@@ -126,7 +140,8 @@ void main() {
 #if CLOUD_STYLE_DEFINE == 50
     out vec2 texCoord;
 
-    flat out vec3 upVec, sunVec;
+    flat out vec3 upVec, sunVec, northVec;
+    out vec3 normal;
 
     out vec4 glColor;
 #endif
@@ -153,8 +168,11 @@ void main() {
 
         glColor = gl_Color;
 
+        normal = normalize(gl_NormalMatrix * gl_Normal);
+
         upVec = normalize(gbufferModelView[1].xyz);
         sunVec = GetSunVector();
+        northVec = normalize(gbufferModelView[2].xyz);
 
         vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
         gl_Position = gl_ProjectionMatrix * gbufferModelView * position;

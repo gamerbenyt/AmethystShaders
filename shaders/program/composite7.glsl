@@ -27,7 +27,7 @@ float GetLinearDepth(float depth) {
 //Program//
 void main() {
     vec3 color = texelFetch(colortex3, texelCoord, 0).rgb;
-        
+
     #if FXAA_DEFINE == 1 && FXAA_STRENGTH > 1
         FXAA311(color);
     #endif

@@ -13,10 +13,11 @@ noperspective in vec2 texCoord;
 in vec3 sunVec;
 
 #ifdef END
-    in float vlFactor;
+    flat in float vlFactor;
 #endif
 
 //Pipeline Constants//
+const bool colortex5MipmapEnabled = true;
 
 //Common Variables//
 vec3 upVec = normalize(gbufferModelView[1].xyz);
@@ -51,6 +52,23 @@ float GetLinearDepth(float depth) {
 #include "/lib/atmospherics/fog/mainFog.glsl"
 #include "/lib/colors/skyColors.glsl"
 #include "/lib/colors/lightAndAmbientColors.glsl"
+
+#if defined SKY_EFFECT_REFLECTION_OPAQUE && defined OVERWORLD
+    #if AURORA_STYLE > 0
+        #include "/lib/atmospherics/auroraBorealis.glsl"
+    #endif
+
+    #if NIGHT_NEBULAE == 1
+        #include "/lib/atmospherics/nightNebula.glsl"
+    #else
+        #include "/lib/atmospherics/stars.glsl"
+    #endif
+
+    #ifdef VL_CLOUDS_ACTIVE
+        #include "/lib/atmospherics/clouds/mainClouds.glsl"
+    #endif
+#endif
+
 #include "/lib/materials/materialMethods/reflections.glsl"
 
 #ifdef ATM_COLOR_MULTS
@@ -62,7 +80,7 @@ void main() {
     ivec2 texelCoord = ivec2(texCoord * view);
     vec4 color = texelFetch(colortex0, texelCoord, 0);
     vec4 texture4 = texelFetch(colortex4, texelCoord, 0);
-    
+
     z0 = texelFetch(depthtex0, texelCoord, 0).r;
     z1 = texelFetch(depthtex1, texelCoord, 0).r;
 
@@ -110,7 +128,7 @@ void main() {
 
         float fresnel = clamp(1.0 + dot(normalM, nViewPos), 0.0, 1.0);
 
-        if (fresnelM > 0.0) {
+        if (abs(fresnelM - 0.5) < 0.5) { // 0.0 fresnel doesnt need ref calculations, and 1.0 fresnel basically means error
             #ifdef TAA
                 float noiseMult = 0.3;
             #else
@@ -142,7 +160,7 @@ void main() {
             vec4 reflection = GetReflection(refNormal, viewPos.xyz, nViewPos, playerPos, lViewPos, z0,
                                             depthtex1, dither, skyLightFactor, fresnel,
                                             smoothnessD, vec3(0.0), vec3(0.0), vec3(0.0), 0.0);
-            
+
             reflection.rgb *= reflectColor;
             reflectOutput = reflection;
 
@@ -219,7 +237,7 @@ noperspective out vec2 texCoord;
 out vec3 sunVec;
 
 #ifdef END
-    out float vlFactor;
+    flat out float vlFactor;
 #endif
 
 //Attributes//
@@ -233,7 +251,7 @@ out vec3 sunVec;
 //Program//
 void main() {
     gl_Position = ftransform();
-    
+
     texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
     sunVec = GetSunVector();

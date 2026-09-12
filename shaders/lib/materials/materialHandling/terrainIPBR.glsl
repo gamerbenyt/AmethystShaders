@@ -30,23 +30,8 @@ if (mat < 11024) {
                                 if (mat < 10012) { // Leaves
                                     #include "/lib/materials/specificMaterials/terrain/leaves.glsl"
                                 }
-                                else /*if (mat < 10016)*/ { // Vine
-                                    subsurfaceMode = 3, centerShadowBias = true; noSmoothLighting = true;
+                                else /*if (mat < 10016)*/ { //
 
-                                    #if defined COATED_TEXTURES && defined GBUFFERS_TERRAIN
-                                        doTileRandomisation = false;
-                                    #endif
-
-                                    float factor = color.g;
-                                    smoothnessG = factor * 0.5;
-                                    highlightMult = factor * 4.0 + 2.0;
-                                    
-                                    #ifdef GBUFFERS_TERRAIN
-                                        float fresnel = clamp(1.0 + dot(normalM, normalize(viewPos)), 0.0, 1.0);
-                                        highlightMult *= 1.0 - pow2(pow2(fresnel));
-                                    #else
-                                        highlightMult *= 0.5;
-                                    #endif
                                 }
                             }
                         } else {
@@ -72,26 +57,31 @@ if (mat < 11024) {
                             } else {
                                 if (mat < 10028) { // Modded Ores
                                     #if defined GLOWING_ORE_MODDED && !defined VOXY_PATCH
-                                        float epsilon = 0.00001;
-                                        vec2 absMidCoordPosM = absMidCoordPos - epsilon;
-                                        vec3 avgBorderColor = vec3(0.0);
+                                        #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                            if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                        #endif
+                                        {
+                                            float epsilon = 0.00001;
+                                            vec2 absMidCoordPosM = absMidCoordPos - epsilon;
+                                            vec3 avgBorderColor = vec3(0.0);
 
-                                        avgBorderColor += texture2D(tex, midCoord + vec2( absMidCoordPosM.x, absMidCoordPosM.y)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2(-absMidCoordPosM.x, absMidCoordPosM.y)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2( absMidCoordPosM.x,-absMidCoordPosM.y)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2(-absMidCoordPosM.x,-absMidCoordPosM.y)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2(epsilon, absMidCoordPosM.y)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2(epsilon,-absMidCoordPosM.y)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2( absMidCoordPosM.x, epsilon)).rgb;
-                                        avgBorderColor += texture2D(tex, midCoord + vec2(-absMidCoordPosM.x, epsilon)).rgb;
-                                        avgBorderColor *= 0.125;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2( absMidCoordPosM.x, absMidCoordPosM.y)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2(-absMidCoordPosM.x, absMidCoordPosM.y)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2( absMidCoordPosM.x,-absMidCoordPosM.y)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2(-absMidCoordPosM.x,-absMidCoordPosM.y)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2(epsilon, absMidCoordPosM.y)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2(epsilon,-absMidCoordPosM.y)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2( absMidCoordPosM.x, epsilon)).rgb;
+                                            avgBorderColor += texture2D(tex, midCoord + vec2(-absMidCoordPosM.x, epsilon)).rgb;
+                                            avgBorderColor *= 0.125;
 
-                                        vec3 colorDif = abs(avgBorderColor - color.rgb);
-                                        emission = max(colorDif.r, max(colorDif.g, colorDif.b));
-                                        emission = pow2(emission * 2.5 - 0.15);
+                                            vec3 colorDif = abs(avgBorderColor - color.rgb);
+                                            emission = max(colorDif.r, max(colorDif.g, colorDif.b));
+                                            emission = pow2(emission * 2.5 - 0.15);
 
-                                        emission *= GLOWING_ORE_MULT;
-                                        //color.rgb = avgBorderColor;
+                                            emission *= GLOWING_ORE_MULT;
+                                            //color.rgb = avgBorderColor;
+                                        }
                                     #endif
                                 }
                                 else /*if (mat < 10032)*/ { // Modded Light Sources
@@ -348,6 +338,10 @@ if (mat < 11024) {
                                 if (mat < 10124) { // Dripstone+, Daylight Detector
                                     smoothnessG = pow2(GetLuminance(color.rgb)) * 0.9 + 0.1;
                                     smoothnessD = smoothnessG;
+
+                                    if (mat == 10123) { // Pointed Dripstone
+                                        noDirectionalShading = true;
+                                    }
 
                                     #ifdef COATED_TEXTURES
                                         noiseFactor = 0.66;
@@ -662,9 +656,14 @@ if (mat < 11024) {
                                     #endif
 
                                     #ifdef GLOWING_ORE_ANCIENTDEBRIS
-                                        emission = min(pow2(color.g * 6.0), 8.0);
-                                        color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
-                                        emission *= GLOWING_ORE_MULT;
+                                        #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                            if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                        #endif
+                                        {
+                                            emission = 1.5 + 0.6 * min(pow2(color.g * 6.0), 8.0);
+                                            color.rgb *= pow(color.rgb, vec3(0.75 * min1(GLOWING_ORE_MULT)));
+                                            emission *= GLOWING_ORE_MULT;
+                                        }
                                     #endif
                                 }
                             }
@@ -683,7 +682,7 @@ if (mat < 11024) {
                                     #include "/lib/materials/specificMaterials/terrain/ironBlock.glsl"
                                 }
                                 else /*if (mat < 10264)*/ { // ACT solid blocks with no properties
-                                    
+
                                 }
                             } else {
                                 if (mat < 10268) { // Iron Block, Heavy Weighted Pressure Plate
@@ -700,6 +699,9 @@ if (mat < 11024) {
                                     if (color.r != color.g) { // Iron Ore:Raw Iron Part
                                         #include "/lib/materials/specificMaterials/terrain/rawIronBlock.glsl"
                                         #ifdef GLOWING_ORE_IRON
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (color.r - color.b > 0.15) {
                                                 emission = pow1_5(color.r) * 1.5;
                                                 color.rgb *= pow(color.rgb, vec3(0.5 * min1(GLOWING_ORE_MULT)));
@@ -714,6 +716,9 @@ if (mat < 11024) {
                                     if (color.r != color.g) { // Deepslate Iron Ore:Raw Iron Part
                                         #include "/lib/materials/specificMaterials/terrain/rawIronBlock.glsl"
                                         #ifdef GLOWING_ORE_IRON
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (color.r - color.b > 0.15) {
                                                 emission = pow1_5(color.r) * 1.5;
                                                 color.rgb *= pow(color.rgb, vec3(0.5 * min1(GLOWING_ORE_MULT)));
@@ -732,7 +737,10 @@ if (mat < 11024) {
                                     if (color.r != color.g) { // Copper Ore:Raw Copper Part
                                         #include "/lib/materials/specificMaterials/terrain/rawCopperBlock.glsl"
                                         #ifdef GLOWING_ORE_COPPER
-                                            if (max(color.r * 0.5, color.g) - color.b > 0.05) {
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            if ((max(color.r * 0.5, color.g) - color.b > 0.05) && (color.r + color.g > 1.9 || color.r + color.g + color.b < 1.9)) {
                                                 emission = color.r * 2.0 + 0.7;
                                                 color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
                                                 emission *= GLOWING_ORE_MULT;
@@ -751,6 +759,9 @@ if (mat < 11024) {
                                     if (color.r != color.g) { // Deepslate Copper Ore:Raw Copper Part
                                         #include "/lib/materials/specificMaterials/terrain/rawCopperBlock.glsl"
                                         #ifdef GLOWING_ORE_COPPER
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (max(color.r * 0.5, color.g) - color.b > 0.05) {
                                                 emission = color.r * 2.0 + 0.7;
                                                 color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
@@ -769,9 +780,12 @@ if (mat < 11024) {
                                     #include "/lib/materials/specificMaterials/terrain/rawGoldBlock.glsl"
                                 }
                                 else /*if (mat < 10304)*/ { // Gold Ore
-                                    if (color.r != color.g || color.r > 0.99) { // Gold Ore:Raw Gold Part
+                                    if ((color.g - color.b > 0.15 || color.r > 0.99) && (color.r + color.g > 1.9 || color.r + color.g + color.b < 1.9)) { // Gold Ore:Raw Gold Part
                                         #include "/lib/materials/specificMaterials/terrain/rawGoldBlock.glsl"
                                         #ifdef GLOWING_ORE_GOLD
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (color.g - color.b > 0.15 || color.r > 0.99) {
                                                 emission = color.r + 1.0;
                                                 color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
@@ -789,6 +803,9 @@ if (mat < 11024) {
                                     if (color.r != color.g || color.r > 0.99) { // Deepslate Gold Ore:Raw Gold Part
                                         #include "/lib/materials/specificMaterials/terrain/rawGoldBlock.glsl"
                                         #ifdef GLOWING_ORE_GOLD
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (color.g - color.b > 0.15 || color.r > 0.99) {
                                                 emission = color.r + 1.0;
                                                 color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
@@ -803,8 +820,13 @@ if (mat < 11024) {
                                     if (color.g != color.b) { // Nether Gold Ore:Raw Gold Part
                                         #include "/lib/materials/specificMaterials/terrain/rawGoldBlock.glsl"
                                         #ifdef GLOWING_ORE_NETHERGOLD
-                                            emission = color.g * 1.5;
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = color.g * 1.5;
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Nether Gold Ore:Netherrack Part
                                         #include "/lib/materials/specificMaterials/terrain/netherrack.glsl"
@@ -828,9 +850,14 @@ if (mat < 11024) {
                                     if (color.b / color.r > 1.5 || color.b > 0.8) { // Diamond Ore:Diamond Part
                                         #include "/lib/materials/specificMaterials/terrain/diamondBlock.glsl"
                                         #ifdef GLOWING_ORE_DIAMOND
-                                            emission = color.g + 1.5;
-                                            color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = color.g + 1.5;
+                                                color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Diamond Ore:Stone Part, Diamond Ore:StoneToDiamond part
                                         #include "/lib/materials/specificMaterials/terrain/stone.glsl"
@@ -840,9 +867,14 @@ if (mat < 11024) {
                                     if (color.b / color.r > 1.5 || color.b > 0.8) { // Deepslate Diamond Ore:Diamond Part
                                         #include "/lib/materials/specificMaterials/terrain/diamondBlock.glsl"
                                         #ifdef GLOWING_ORE_DIAMOND
-                                            emission = color.g + 1.5;
-                                            color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = color.g + 1.5;
+                                                color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Deepslate Diamond Ore:Deepslate Part, Deepslate Diamond Ore:DeepslateToDiamond part
                                         #include "/lib/materials/specificMaterials/terrain/deepslate.glsl"
@@ -901,9 +933,14 @@ if (mat < 11024) {
                                     if (dif > 0.4 || color.b > 0.85) { // Emerald Ore:Emerald Part
                                         #include "/lib/materials/specificMaterials/terrain/emeraldBlock.glsl"
                                         #ifdef GLOWING_ORE_EMERALD
-                                            emission = 2.0;
-                                            color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = 2.0;
+                                                color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Emerald Ore:Stone Part
                                         #include "/lib/materials/specificMaterials/terrain/stone.glsl"
@@ -915,9 +952,14 @@ if (mat < 11024) {
                                     if (dif > 0.4 || color.b > 0.85) { // Deepslate Emerald Ore:Emerald Part
                                         #include "/lib/materials/specificMaterials/terrain/emeraldBlock.glsl"
                                         #ifdef GLOWING_ORE_EMERALD
-                                            emission = 2.0;
-                                            color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = 2.0;
+                                                color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Deepslate Emerald Ore:Deepslate Part
                                         #include "/lib/materials/specificMaterials/terrain/deepslate.glsl"
@@ -944,6 +986,9 @@ if (mat < 11024) {
                                         smoothnessG *= 0.5;
                                         smoothnessD *= 0.5;
                                         #ifdef GLOWING_ORE_LAPIS
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (color.b - color.r > 0.2) {
                                                 emission = 2.0;
                                                 color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
@@ -961,6 +1006,9 @@ if (mat < 11024) {
                                         smoothnessG *= 0.5;
                                         smoothnessD *= 0.5;
                                         #ifdef GLOWING_ORE_LAPIS
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
                                             if (color.b - color.r > 0.2) {
                                                 emission = 2.0;
                                                 color.rgb *= pow(color.rgb, vec3(min1(GLOWING_ORE_MULT)));
@@ -981,8 +1029,13 @@ if (mat < 11024) {
                                     if (color.g != color.b) { // Nether Quartz Ore:Quartz Part
                                         #include "/lib/materials/specificMaterials/terrain/quartzBlock.glsl"
                                         #ifdef GLOWING_ORE_NETHERQUARTZ
-                                            emission = pow2(color.b * 1.6);
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = pow2(color.b * 1.6);
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Nether Quartz Ore:Netherrack Part
                                         #include "/lib/materials/specificMaterials/terrain/netherrack.glsl"
@@ -1070,7 +1123,7 @@ if (mat < 11024) {
                                     #if ANISOTROPIC_FILTER == 0 && !defined IPBR_COMPAT_MODE
                                         color = texture2DLod(tex, texCoord, 0);
                                     #endif
-                                    
+
                                     if (color.b > 0.5) { // Sea Pickle:Emissive Part
                                         #ifdef GBUFFERS_TERRAIN
                                             color.g *= 1.1;
@@ -1192,7 +1245,7 @@ if (mat < 11024) {
                                     #else
                                         float factor = pow2(pow2(min(dot(color.rgb, color.rgb), 2.5) / 2.5));
                                     #endif
-                                    
+
                                     emission = pow2(color.b) * 1.6 + 2.2 * factor;
                                     emission *= 0.4 + max0(0.6 - 0.006 * lViewPos);
 
@@ -1306,8 +1359,13 @@ if (mat < 11024) {
                                     if (color.r > color.b * 3.0) { // Gilded Blackstone:Gilded Part
                                         #include "/lib/materials/specificMaterials/terrain/rawGoldBlock.glsl"
                                         #ifdef GLOWING_ORE_GILDEDBLACKSTONE
-                                            emission = color.g * 1.5;
-                                            emission *= GLOWING_ORE_MULT;
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = color.g * 1.5;
+                                                emission *= GLOWING_ORE_MULT;
+                                            }
                                         #endif
                                     } else { // Gilded Blackstone:Blackstone Part
                                         #include "/lib/materials/specificMaterials/terrain/blackstone.glsl"
@@ -1352,8 +1410,8 @@ if (mat < 11024) {
                                         #endif
                                         color.r *= 1.3;
                                         color.b *= 0.5;
-                                    } 
-                                    
+                                    }
+
                                     #ifdef GBUFFERS_TERRAIN
                                         else if (abs(NdotU) < 0.5) {
                                             #ifndef IPBR_COMPAT_MODE
@@ -1399,7 +1457,7 @@ if (mat < 11024) {
                                         color.g *= 0.95;
                                     }
 
-                                    #if defined GBUFFERS_TERRAIN && ! defined GBUFFERS_COLORWHEEL 
+                                    #if defined GBUFFERS_TERRAIN && ! defined GBUFFERS_COLORWHEEL
                                         else { // Directional Self-light Effect
                                             vec3 fractPos = abs(fract(playerPos + cameraPosition) - 0.5);
                                             float maxCoord = max(fractPos.x, max(fractPos.y, fractPos.z));
@@ -1437,7 +1495,12 @@ if (mat < 11024) {
                         if (mat < 10528) {
                             if (mat < 10520) {
                                 if (mat < 10516) { // Chorus Flower:Dead
-                                    vec3 checkColor = texture2DLod(tex, texCoord, 0).rgb;
+                                    #ifndef VOXY_PATCH
+                                        vec3 checkColor = texture2DLod(tex, texCoord, 0).rgb;
+                                    #else
+                                        vec3 checkColor = color.rgb;
+                                    #endif
+
                                     if (CheckForColor(checkColor, vec3(164, 157, 126)) ||
                                         CheckForColor(checkColor, vec3(201, 197, 176)) ||
                                         CheckForColor(checkColor, vec3(226, 221, 188)) ||
@@ -1446,7 +1509,15 @@ if (mat < 11024) {
                                         emission = min(GetLuminance(color.rgb), 0.75) / 0.75;
                                         emission = pow2(pow2(emission)) * 6.5;
                                         color.gb *= 0.85;
-                                    } else emission = max0(GetLuminance(color.rgb) - 0.5) * 3.0;
+                                    }
+
+                                    else {
+                                        emission = max0(GetLuminance(color.rgb) - 0.5) * 3.0;
+
+                                        #ifdef VOXY_PATCH
+                                            emission += sqrt(max0(color.g * 2.55 - color.r - color.b)) * 5.0;
+                                        #endif
+                                    }
                                 }
                                 else /*if (mat < 10520)*/ { // Furnace:Lit
                                     lmCoordM.x *= 0.95;
@@ -1628,7 +1699,7 @@ if (mat < 11024) {
                                     emission = 4.3 * max0(color.r - color.b);
                                     emission += min(pow2(pow2(0.75 * dot(color.rgb, color.rgb))), 5.0);
                                     color.gb *= pow(vec2(0.8, 0.7), vec2(sqrt(emission) * 0.5));
-                                    
+
                                     #ifdef DISTANT_LIGHT_BOKEH
                                         DoDistantLightBokehMaterial(color, vec4(1.0, 0.6, 0.2, 1.0), emission, 5.0, lViewPos);
                                     #endif
@@ -1778,9 +1849,14 @@ if (mat < 11024) {
                                     if (color.r - color.g > 0.2) { // Redstone Ore:Unlit:Redstone Part
                                         #include "/lib/materials/specificMaterials/terrain/redstoneBlock.glsl"
                                         #ifdef GLOWING_ORE_REDSTONE
-                                            emission = color.r * pow1_5(color.r) * 4.0;
-                                            color.gb *= 1.0 - 0.9 * min1(GLOWING_ORE_MULT);
-                                            emission *= min1(GLOWING_ORE_MULT);
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = color.r * pow1_5(color.r) * 4.0;
+                                                color.gb *= 1.0 - 0.9 * min1(GLOWING_ORE_MULT);
+                                                emission *= min1(GLOWING_ORE_MULT);
+                                            }
                                         #endif
                                     } else { // Redstone Ore:Unlit:Stone Part
                                         #include "/lib/materials/specificMaterials/terrain/stone.glsl"
@@ -1801,9 +1877,14 @@ if (mat < 11024) {
                                     if (color.r - color.g > 0.2) { // Deepslate Redstone Ore:Unlit:Redstone Part
                                         #include "/lib/materials/specificMaterials/terrain/redstoneBlock.glsl"
                                         #ifdef GLOWING_ORE_REDSTONE
-                                            emission = color.r * pow1_5(color.r) * 4.0;
-                                            color.gb *= 1.0 - 0.9 * min1(GLOWING_ORE_MULT);
-                                            emission *= min1(GLOWING_ORE_MULT);
+                                            #ifdef IRIS_HAS_CONNECTED_TEXTURES
+                                                if (textureLod(tex, midCoord, 4.0).a > 0.99)
+                                            #endif
+                                            {
+                                                emission = color.r * pow1_5(color.r) * 4.0;
+                                                color.gb *= 1.0 - 0.9 * min1(GLOWING_ORE_MULT);
+                                                emission *= min1(GLOWING_ORE_MULT);
+                                            }
                                         #endif
                                     } else { // Deepslate Redstone Ore:Unlit:Deepslate Part
                                         #include "/lib/materials/specificMaterials/terrain/deepslate.glsl"
@@ -1879,7 +1960,7 @@ if (mat < 11024) {
                                 }
                                 else /*if (mat < 10648)*/ { // Repeater, Comparator
                                     noSmoothLighting = true;
-                                    
+
                                     #if ANISOTROPIC_FILTER > 0 && !defined IPBR_COMPAT_MODE
                                         color = texture2D(tex, texCoord); // Fixes artifacts
                                         color.rgb *= glColor.rgb;
@@ -2170,8 +2251,25 @@ if (mat < 11024) {
                         } else {
                             if (mat < 10760) {
                                 if (mat < 10756) { // Bamboo
-                                    if (absMidCoordPos.x > 0.005)
+                                    #if ANISOTROPIC_FILTER == 0
+                                        vec4 checkColor = color;
+                                    #else
+                                        vec4 checkColor = texture2DLod(tex, texCoord, 0); // Fixes artifacts
+                                    #endif
+                                    if (
+                                        CheckForColor(checkColor.rgb, vec3(55, 90, 21)) ||
+                                        CheckForColor(checkColor.rgb, vec3(47, 69, 23)) ||
+                                        CheckForColor(checkColor.rgb, vec3(82, 137, 25)) ||
+                                        CheckForColor(checkColor.rgb, vec3(103, 161, 36)) ||
+                                        CheckForColor(checkColor.rgb, vec3(69, 118, 22)) ||
+                                        CheckForColor(checkColor.rgb, vec3(43, 62, 22)) ||
+                                        CheckForColor(checkColor.rgb, vec3(105, 144, 34)) ||
+                                        CheckForColor(checkColor.rgb, vec3(80, 117, 22)) ||
+                                        CheckForColor(checkColor.rgb, vec3(148, 187, 79)) ||
+                                        CheckForColor(checkColor.rgb, vec3(86, 129, 18))
+                                    ) {
                                         subsurfaceMode = 1, noSmoothLighting = true, noDirectionalShading = true;
+                                    }
                                     // No further material properties as bamboo jungles are already slow
                                 }
                                 else /*if (mat < 10760)*/ { // Block of Bamboo, Bamboo Planks++
@@ -2628,8 +2726,8 @@ if (mat < 11024) {
                                         #else
                                             emission = 2.2;
                                         #endif
-                                    } 
-                                    
+                                    }
+
                                     #ifdef GBUFFERS_TERRAIN
                                         else if (abs(NdotU) < 0.5) {
                                             #ifndef IPBR_COMPAT_MODE
@@ -2660,8 +2758,8 @@ if (mat < 11024) {
 
                                     if (color.g - color.r > 0.2 && abs(color.r - color.b) < 0.1 || lum > 0.8) {
                                         emission = 4.0 * lum;
-                                    } 
-                                    
+                                    }
+
                                     #ifdef DISTANT_LIGHT_BOKEH
                                         //DoDistantLightBokehMaterial(color, vec4(1.0, 0.6, 0.2, 1.0), emission, 5.0, lViewPos);
                                     #endif
@@ -2675,24 +2773,55 @@ if (mat < 11024) {
                     } else {
                         if (mat < 11008) {
                             if (mat < 11000) {
-                                if (mat < 10996) { //
+                                if (mat < 10996) { // Sulfur+, Potent Sulfur, Sulfur Spike
+                                    if (mat == 10995) { // Sulfur Spike
+                                        noDirectionalShading = true;
+                                    }
 
+                                    smoothnessG = pow2(pow2(max(color.r, max(color.g, color.b)))) * 0.35;
+                                    smoothnessD = smoothnessG;
                                 }
-                                else /*if (mat < 11000)*/ { //
+                                else /*if (mat < 11000)*/ { // Chiseled Sulfur, Polished Sulfur+, Sulfur Bricks+
+                                    smoothnessG = pow2(pow2(max(color.r, max(color.g, color.b)))) * 0.8;
+                                    smoothnessD = smoothnessG;
 
+                                    #ifdef COATED_TEXTURES
+                                        noiseFactor = 0.77;
+                                    #endif
                                 }
                             } else {
-                                if (mat < 11004) { //
-
+                                if (mat < 11004) { // Cinnabar+
+                                    smoothnessG = pow2(pow2(color.r)) * 0.7;
+                                    smoothnessD = smoothnessG;
                                 }
-                                else /*if (mat < 11008)*/ { //
+                                else /*if (mat < 11008)*/ { // Chiseled Cinnabar, Polished Cinnabar+, Cinnabar Bricks+
+                                    smoothnessG = pow1_5(color.r) * 0.7;
+                                    smoothnessD = smoothnessG;
 
+                                    #ifdef COATED_TEXTURES
+                                        noiseFactor = 0.5;
+                                    #endif
                                 }
                             }
                         } else {
                             if (mat < 11016) {
-                                if (mat < 11012) { //
+                                if (mat < 11012) { // Vine, Pale Hanging Moss
+                                    subsurfaceMode = 3, centerShadowBias = true; noSmoothLighting = true;
 
+                                    #if defined COATED_TEXTURES && defined GBUFFERS_TERRAIN
+                                        doTileRandomisation = false;
+                                    #endif
+
+                                    float factor = color.g;
+                                    smoothnessG = factor * 0.5;
+                                    highlightMult = factor * 4.0 + 2.0;
+
+                                    #ifdef GBUFFERS_TERRAIN
+                                        float fresnel = clamp(1.0 + dot(normalM, normalize(viewPos)), 0.0, 1.0);
+                                        highlightMult *= 1.0 - pow2(pow2(fresnel));
+                                    #else
+                                        highlightMult *= 0.5;
+                                    #endif
                                 }
                                 else /*if (mat < 11016)*/ { //
 

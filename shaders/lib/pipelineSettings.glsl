@@ -9,10 +9,10 @@ const int colortex6Format = RGB8;           //smoothnessD & materialMask & skyLi
 const int colortex7Format = RGBA16F;        //(cloud/water map on gbuffer) | reflection temporal image (rgb) & previous depth
 const int colortex8Format = RGBA16F;        //SSR results for WSR, topmost translucent opacity
 
-const int colortex12Format = RGBA8;          //Improved Rain
+const int colortex12Format = RGBA8;         //Improved Rain
 
-const int colortex18Format = R8;            //shadow for voxy chunks (needs reprojection)
-const int colortex19Format = RGBA8;         //scene image for voxy reflections (needs reprojection)
+const int colortex18Format = R8;            //shadow for voxy chunks
+const int colortex19Format = RGBA8;         //scene image for voxy reflections
 */
 
 const bool colortex0Clear = true;

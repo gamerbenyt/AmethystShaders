@@ -57,7 +57,7 @@ void main() {
         #ifdef IS_IRIS
             bool isSun = renderStage == MC_RENDER_STAGE_SUN;
             bool isMoon = renderStage == MC_RENDER_STAGE_MOON;
-            #if IRIS_VERSION < 10902
+            #if IRIS_VERSION < 10814
                 if (sunSideCheck) isSun = true; // Workaround for sun rendering as MC_RENDER_STAGE_MOON in some Iris versions
             #endif
         #else

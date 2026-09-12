@@ -121,7 +121,7 @@ void DoWave(inout vec3 playerPos, int mat) {
                 if (gl_MultiTexCoord0.t < mc_midTexCoord.t || fract(worldPos.y + 0.21) > 0.26)
                 DoWave_Foliage(playerPos.xyz, worldPos, 1.0);
             }
-            
+
             else if (mat == 10021) { // Upper Layer Foliage
                 DoWave_Foliage(playerPos.xyz, worldPos, 1.0);
             }
@@ -147,7 +147,7 @@ void DoWave(inout vec3 playerPos, int mat) {
         #ifdef WAVING_LEAVES
             if (mat == 10009) { // Leaves
                 DoWave_Leaves(playerPos.xyz, worldPos, 1.0);
-            } else if (mat == 10013) { // Vine
+            } else if (mat == 11009) { // Vine, Pale Hanging Moss
                 // Reduced waving on vines to prevent clipping through blocks
                 DoWave_Leaves(playerPos.xyz, worldPos, 0.75);
             }

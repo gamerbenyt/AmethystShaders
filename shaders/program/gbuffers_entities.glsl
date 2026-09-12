@@ -177,7 +177,7 @@ void main() {
             #endif
 
             #if IPBR_EMISSIVE_MODE != 1
-                emission = GetCustomEmissionForIPBR(color, emission);
+                emission = GetCustomEmissionForIPBR(color, glColor, emission);
             #endif
         #else
             #ifdef CUSTOM_PBR
@@ -209,6 +209,7 @@ void main() {
     }
 
     vec3 translucentMult = mix(vec3(0.666), color.rgb * (1.0 - pow2(pow2(color.a))), color.a);
+    translucentMult.rgb = mix(translucentMult.rgb, vec3(1.0), min1(lViewPos / 50.0));
     float skyLightFactor = GetSkyLightFactor(lmCoordM, shadowMult);
 
     #ifdef COLOR_CODED_PROGRAMS
@@ -222,6 +223,11 @@ void main() {
         float dither = Bayer64(gl_FragCoord.xy);
         #ifdef TAA
             dither = fract(dither + goldenRatio * mod(float(frameCounter), 3600.0));
+        #endif
+
+        #ifdef ATM_COLOR_MULTS
+            atmColorMult = GetAtmColorMult();
+            sqrtAtmColorMult = sqrt(atmColorMult);
         #endif
 
         float skyFade = 0.0;
@@ -241,7 +247,7 @@ void main() {
     gl_FragData[1] = vec4(1.0 - translucentMult, 1.0);
     gl_FragData[2] = vec4(smoothnessD, materialMask, skyLightFactor, 1.0);
 
-    #if BLOCK_REFLECT_QUALITY >= 2 && RP_MODE >= 1
+    #if BLOCK_REFLECT_QUALITY >= 2 && RP_MODE >= 1 || defined WORLD_SPACE_REFLECTIONS > 0
         /* DRAWBUFFERS:0364 */
         gl_FragData[3] = vec4(mat3(gbufferModelViewInverse) * normalM, 1.0);
     #endif

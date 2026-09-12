@@ -2,7 +2,13 @@ float fovmult = gbufferProjection[1][1] / 1.37373871;
 
 float BaseLens(vec2 lightPos, float size, float dist, float hardness) {
     vec2 lensCoord = (texCoord + (lightPos * dist - 0.5)) * vec2(aspectRatio, 1.0);
-    float lens = clamp(1.0 - length(lensCoord) / (size * fovmult), 0.0, 1.0 / hardness) * hardness;
+    #if LENSFLARE_MODE == 1 || LENSFLARE_MODE == 2
+        float shape = length(lensCoord.xy);
+    #else
+        vec2 lensCoordM = pow2(pow2(lensCoord.xy * lensCoord.xy));
+        float shape = 3.0 * sqrt(sqrt(lensCoordM.x + lensCoordM.y));
+    #endif
+    float lens = clamp(1.0 - shape / (size * fovmult), 0.0, 1.0 / hardness) * hardness;
     lens *= lens; lens *= lens;
     return lens;
 }
@@ -38,7 +44,7 @@ vec2 lensFlareCheckOffsets[4] = vec2[4](
 );
 
 void DoLensFlare(inout vec3 color, vec3 viewPos, float dither) {
-    #if LENSFLARE_MODE == 1
+    #if LENSFLARE_MODE == 1 || LENSFLARE_MODE == 3
         if (sunVec.z > 0.0) return;
     #endif
 
@@ -103,7 +109,7 @@ void DoLensFlare(inout vec3 color, vec3 viewPos, float dither) {
         RingLens(lightPos, 0.15, 0.98, 0.99) * vec3(0.15, 0.40, 2.55) * 2.5
     );
 
-    #if LENSFLARE_MODE == 2
+    #if LENSFLARE_MODE == 2 || LENSFLARE_MODE == 4
         if (sunVec.z > 0.0) {
             flare = flare * 0.2 + GetLuminance(flare) * vec3(0.3, 0.4, 0.6);
             flare *= clamp01(1.0 - (SdotU + 0.1) * 5.0);

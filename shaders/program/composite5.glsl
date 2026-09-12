@@ -69,7 +69,7 @@ void DoCompTonemap(inout vec3 color) {
     float darkLift = smoothstep(darkLiftStart, 0.0, initialLuminance);
     vec3 smoothColor = pow(color, vec3(1.0 / 2.2));
     colorOut = mix(colorOut, smoothColor, darkLift * darkLiftMix * max0(0.55 - abs(1.05 - TM_CONTRAST)) / 0.55);
-    
+
     // Path to White
     const float wpInputCurveStart = 0.0;
     const float wpInputCurveMax = 16.0; // Increase this value to reduce the effect of white path
@@ -82,7 +82,7 @@ void DoCompTonemap(inout vec3 color) {
     const float dpInputCurveMax = 0.0;
     float desaturatePath = smoothstep(dpInputCurveStart, dpInputCurveMax, initialLuminance);
     colorOut = mix(colorOut, vec3(GetLuminance(colorOut)), desaturatePath * TM_DARK_DESATURATION);
-    
+
     color = clamp01(colorOut);
 }
 
@@ -160,7 +160,7 @@ void DoBSLColorSaturation(inout vec3 color) {
 //Program//
 void main() {
     vec3 color = texture2D(colortex0, texCoord).rgb;
-    
+
     #if defined BLOOM_FOG || LENSFLARE_MODE > 0 && defined OVERWORLD
         float z0 = texture2D(depthtex0, texCoord).r;
         vec4 screenPos = vec4(texCoord, z0, 1.0);

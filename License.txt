@@ -1,4 +1,4 @@
-Complementary License Agreement 1.6
+Complementary License Agreement 1.7
 ===================================
 
 0. Terminology
@@ -77,6 +77,9 @@ Complementary License Agreement 1.6
          e. The Modified Pack must not have any other license agreements
             or terms other than this agreement, regardless of how much new
             code has been added to the Modified Pack.
+         f. The Modified Pack must have a significant amount of human-written
+            code additions that noticeably contribute to the final visuals in
+            multiple common gameplay scenarios
 
 2. Denied Cases
 ---------------

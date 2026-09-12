@@ -21,43 +21,43 @@ option.info0.comment=This section contains buttons that only exist to provide in
 
 option.info1=How to get more performance
 value.info1.0=
-option.info1.comment=Performance is a complex topic in Minecraft because it gets affected by so many things, but you can try these:. Reduce your render distance, ideally it should be between 6 and 16 for almost every device. Reduce the "Profile" shader setting, these have been carefully tested for the best visual/performance ratio. More information will be added later.
+option.info1.comment=- Performance is a complex topic in Minecraft because it gets affected by so many things, but you can try these:. - Use Iris+Sodium mods instead of Optifine, because Optifine is problematic and won't even let you read rest of this description in some cases. - Reduce the "Profile" shader setting, these have been carefully tested for the best visual/performance ratio. - Reduce your render distance, I recommend setting it to be 2-4 chunks higher than the "shadow distance" of the "Profile" you have chosen, so for example, 16 chunks of render distance for the "High" profile, 6 chunks for the Potato profile. - Make sure your resolution isnt too excessive, 1920x1080 is great for mid tier systems, 1440p is viable for high tier systems, 4k is excessive. - Make sure you don't have a massive amount of mods, even if most of those mods are "optimization mods", they usually aren't that helpful for shaders. It's also worth mentioning that some resource packs, especially ones that add more complex foliage/leaves cost a ton of performance.
 
 option.info2=What are the best settings
 value.info2.0=
-option.info2.comment=Best settings are subjective, but using the default settings will be the near-best for most people. The default settings have been shaped by years of community evaluations and feedback, while paying a lot of attention to the visual/performance ratio. But you should still feel free to tweak around and have fun doing so!
+option.info2.comment=- Best settings are subjective, but using the default "Profile" options are going to be the near-best for most people. - The default settings have been shaped by years of community evaluations, testing, and feedback; while paying a lot of attention to the visuals/performance ratio. - But you should still feel free to tweak around and have fun doing so!
 
 option.info3=What is Profile or Visual Style
 value.info3.0=
-option.info3.comment="Profile" setting changes the settings found in the "Performance Settings" menu, while not affecting any preference-based settings. "Visual Style" changes the "Set by Style" values that exist on many preference-based settings, but it does not impact performance by an important amount.
+option.info3.comment=- "Profile" setting changes the settings found in the "Performance Settings" menu, while not affecting any preference-based settings. - "Visual Style" changes the "Set by Style" values that exist on many preference-based settings, but it does not impact performance by an important amount. - The only difference between Complementary Reimagined and Unbound is the default option of "Visual Style"
 
 option.info4=What is RP Support
 value.info4.0=
-option.info4.comment=RP Support option determines how the shader pack treats the different blocks of Minecraft. For example, §bIntegratedPBR+§r treats gold blocks as reflective things, while §elabPBR§r or §eseuspbr§r require you to install a resource pack to tell that to the shader. Setting RP Support to §aBasic§r will make it so that no block is "special" other than a couple exceptions like water.
+option.info4.comment=- RP Support option determines how the shader pack treats the different blocks of Minecraft. - For example, §bIntegratedPBR+§r treats gold blocks as reflective things, while §elabPBR§r or §eseuspbr§r require you to install a resource pack to tell that to the shader. - Setting RP Support to §aBasic§r will make it so that no block is "special" other than a couple exceptions like water.
 
 option.info5=What are yellow settings
 value.info5.0=
-option.info5.comment=A setting with a yellow name means that the setting impacts performance by a measurable amount despite not being in the "Performance Settings" category. If enabling it results in a red option text, it means that the performance cost is very high.
+option.info5.comment=- A setting with a yellow name means that the setting impacts performance by a measurable amount despite not being in the "Performance Settings" category. - If enabling it results in a red option text, it means that the performance cost is very high.
 
-option.info6=
+option.info6=Are there any recommended mods
 value.info6.0=
-option.info6.comment=
+option.info6.comment=- Aside from Iris and Sodium which are essential, I recommend a block-entity optimization mod like "Optimized Block Entities" or "Enhanced Block Entities" for improved performance. - Aside from that, the "RenderScale" mod can be good for easily adjusting resolution. - It's also worth mentioning "Voxy" or "Distant Horizons" mods that add a way to have extreme render distances with non-extreme performance cost; I recommend using 64 to 256 chunks of Voxy render distance, or 64 to 128 chunks of Distant Horizons distance, with 8 to 12 chunks of regular render distance if you are using either mods. - Lastly you can get the "Euphoria Patches" mod that adds a modified Complementary to your shaders list with more functionality and settings; alongside adding several Iris fixes/tweaks even when you aren't using the modified Complementary-Euphoria shader pack, like making colored lighting work even at very high world coordinates.
 
-option.info7=
+option.info7=Where to ask questions or report problems
 value.info7.0=
-option.info7.comment=
+option.info7.comment=- Please either use the Complementary Discord server for questions, or use the "issues" section in the Github page. - www.complementary.dev/discord. - www.complementary.dev/github
 
 option.info8=How to join the community
 value.info8.0=
-option.info8.comment=You can join the Complementary Discord server to join our friendly community, and be able to contact developers or experienced community members. www.complementary.dev/discord
+option.info8.comment=- You can join the Complementary Discord server to join our friendly community, and be able to contact developers or experienced community members. - www.complementary.dev/discord
 
 option.info9=How to support Complementary
 value.info9.0=
-option.info9.comment=Best way to support the development of Complementary is to share it with your friends or social media, but you can also directly support the developer on Patreon. www.patreon.com/emingt
+option.info9.comment=- Best way to support Complementary is to share it with your friends or social media, but you can also directly support the main developer (me!) on Patreon. - www.patreon.com/emingt
 
 option.info10=Credits
 value.info10.0=
-option.info10.comment=EminGT: The main developer of Complementary. Capt Tatsu: Developer of BSL Shaders, his generosity is what made Complementary possible in the first place. Special Thanks: IMS212, sp614x, Chocapic13, Robobo1221, SixthSurge, null511, fayer3, catlikecoding, Builderb0y, Jessie, SpacEagle17, isuewo, flytrap, gri573, FoZy-STYLE, plazmal
+option.info10.comment=- EminGT: The main developer of Complementary. - Capt Tatsu: Developer of BSL Shaders, his generosity is what made Complementary possible in the first place. - Special Thanks: IMS212, sp614x, Chocapic13, Robobo1221, SixthSurge, null511, fayer3, catlikecoding, Builderb0y, Jessie, SpacEagle17, isuewo, flytrap, gri573, FoZy-STYLE, plazmal, aceralex
 
 #Style
 option.SHADER_STYLE=Visual Style
@@ -249,10 +249,11 @@ value.ENTITY_SHADOW.1=§cRegular Entities
 value.ENTITY_SHADOW.2=§4§k-§r§4§l§n§oFull§r§4§k- §r§c[-]
 
 option.DETAIL_QUALITY=Detail Quality
-option.DETAIL_QUALITY.comment=Adjusts several small things that affect performance. Adjust the quality of: Water material, TAA, lighting tweaks, Night Nebula, Nether Storm, sky effect reflections, rain puddle accuracy, waving effect, motion blur
+option.DETAIL_QUALITY.comment=Adjusts several small things that affect performance. Adjust the quality of: Water material, TAA, lighting tweaks, Night Nebula, Nether Storm, sky effect reflections, rain puddle accuracy, waving effect, motion blur, reflection fixes, texture filtering on translucents
 value.DETAIL_QUALITY.0=§aPotato
 value.DETAIL_QUALITY.2=§eMedium
 value.DETAIL_QUALITY.3=§cHigh
+value.DETAIL_QUALITY.4=§4§k-§r§4§l§n§oUltra§r§4§k-
 
 option.CLOUD_QUALITY=Cloud Quality
 option.CLOUD_QUALITY.comment=Adjusts the lighting, detail, and sample quality of Fantasy/Realistic cloud styles. §e[*]§r This setting only works with the "Fantasy" or "Realistic" Cloud Styles.
@@ -345,7 +346,8 @@ option.LIGHTSHAFT_SMOKE.comment=Adds volumetric smoke to the light shafts. §c[-
 option.SPECIAL_PALE_GARDEN_LIGHTSHAFTS=Special Pale Garden Shafts
 option.SPECIAL_PALE_GARDEN_LIGHTSHAFTS.comment=Makes light shafts look extra spicy in the "Pale Garden" biome.
 
-option.LIGHTSHAFT_DAY_I=Light Shaft Day Multiplier
+option.LIGHTSHAFT_NOON_I=Light Shaft Noon Multiplier
+option.LIGHTSHAFT_SUNSET_I=Light Shaft Sunset Multiplier
 option.LIGHTSHAFT_NIGHT_I=Light Shaft Night Multiplier
 option.LIGHTSHAFT_RAIN_I=Light Shaft Rain Multiplier
 
@@ -688,16 +690,19 @@ value.IMAGE_SHARPENING.10=10x §c[-]
 option.LENSFLARE_MODE=§eLens Flare§r
 option.LENSFLARE_MODE.comment=Adds camera lens reflection effect when towards the sun or moon. §c[-]§r This effect can severely impact performance.
 value.LENSFLARE_MODE.0=OFF
-value.LENSFLARE_MODE.1=§cSun Only
-value.LENSFLARE_MODE.2=§cSun & Moon
+value.LENSFLARE_MODE.1=§cSun Only - Circle
+value.LENSFLARE_MODE.2=§cSun & Moon - Circle
+value.LENSFLARE_MODE.3=§cSun Only - Square
+value.LENSFLARE_MODE.4=§cSun & Moon - Square
 
 option.LENSFLARE_I=Lens Flare Intensity
 option.LENSFLARE_I.comment=Adjusts the strength of the Lens Flare effect.
 
-option.TAA_MODE=§eTemporal Filtering§r
-option.TAA_MODE.comment=Enables temporal anti aliasing which helps smooth out grainy effects, improves performance by reducing the sample counts of some heavier effects, and can reduce aliasing with the right settings. §c[-]§r: Turning this off will cause worse performance and worse effect quality.
-value.TAA_MODE.0=§cOFF [-]
-value.TAA_MODE.1=ON §a[+]
+option.TAA_DEFINE=§eTemporal Filtering§r
+option.TAA_DEFINE.comment=Enables temporal anti aliasing which helps smooth out grainy effects, improves performance by reducing the sample counts of some heavier effects, and can reduce aliasing with the right settings. §c[-]§r: Turning this off will cause worse performance and worse effect quality, but it can also increase performance when paired with very low shader settings.
+value.TAA_DEFINE.-1=§aSet By DQ
+value.TAA_DEFINE.0=§cOFF [-]
+value.TAA_DEFINE.1=ON §a[+]
 
 option.TAA_SMOOTHING=Temporal Smoothing
 option.TAA_SMOOTHING.comment=Adjusts the amount of smoothing that the Temporal Filter will apply. Higher values produce a blurrier image but reduce flickering and graining. The difference won't be noticeable when standing still.
@@ -792,14 +797,18 @@ option.IPBR_COMPAT_MODE_DEFINE.comment=Changes how some IPBR+ features are calcu
 option.IPBR_PARTICLE_FEATURES=IPBR+ Particle Features
 option.IPBR_PARTICLE_FEATURES.comment=Enables several features for particles, including things like glowing lava particles and better-colored water particles.
 
-option.FANCY_GLASS=Improved Glass
+option.FANCY_GLASS=Improved Glass §c[-]§r
 option.FANCY_GLASS.comment=Improves the regular glass by adding a translucent layer to it. §c[-]§r Does not work on older Iris versions. §e[*]§r RP Support option must be set to Integrated PBR+.
 
 option.GREEN_SCREEN_LIME=Green Screen Lime Blocks
 option.GREEN_SCREEN_LIME.comment=Turns "Lime Concrete", "Lime Wool", and "Lime Carpet" into green screens for video editing. Tip 1: Turn off "Bloom" option to improve separation. Tip 2: Put lights under lime carpets for lighting. Tip 3: You can turn off Anti-Aliasing (FXAA) and set Detail Quality to Potato in Performance Settings to disable all filtering and get pixel-perfect separation.
 
 option.MIRROR_TINTED_GLASS=Mirror-like Tinted Glass
-option.MIRROR_TINTED_GLASS.comment=Increases the reflectiveness and opacity of Tinted Glass blocks. Enable World-Space Reflections for best results.
+option.MIRROR_TINTED_GLASS.comment=Increases the reflectiveness and opacity of Tinted Glass blocks. Enable World-Space Reflections for best results. §c[-]§r It's not recommended to use 100% Mirror in general gameplay due to it making a lot of reflection issues really apparent.
+value.MIRROR_TINTED_GLASS.0=OFF
+value.MIRROR_TINTED_GLASS.35=35% Mirror
+value.MIRROR_TINTED_GLASS.70=70% Mirror
+value.MIRROR_TINTED_GLASS.100=100% Mirror §c[-]
 
 option.MORE_REFLECTIVE_DISTANT_GLASS=More Reflective Distant Glass
 option.MORE_REFLECTIVE_DISTANT_GLASS.comment=Increases the reflectiveness and opacity of distant glass to make buildings with glass windows look nicer.
@@ -849,6 +858,19 @@ option.PLAYER_SHADOW=Player Shadow §e[*]§r
 option.PLAYER_SHADOW.comment=Determines if the player will cast a shadow or not. §e[*]§r This setting only fully works on Iris. §e[*]§r This setting will be disabled if "Real-Time Shadows" is OFF.
 value.PLAYER_SHADOW.-1=OFF
 value.PLAYER_SHADOW.1=ON
+
+option.LEAF_SHADOW_OPTIMISATION_DEFINE=§eLeaf Shadow Optimization§r
+option.LEAF_SHADOW_OPTIMISATION_DEFINE.comment=Disables shadows of leaves and vines in darker areas to gain performance. §c[-]§r The main downside of this optimization is that it messes up lighting with some fancy leaf resource packs. §e[*]§r "Set By DQ" means that this setting is determined by "Detail Quality" in Performance Settings unless you change it.
+value.LEAF_SHADOW_OPTIMISATION_DEFINE.-1=§aSet By DQ
+value.LEAF_SHADOW_OPTIMISATION_DEFINE.0=§cOFF
+value.LEAF_SHADOW_OPTIMISATION_DEFINE.1=§aON
+
+option.SKY_EFFECT_REFLECTION_DEFINE=§eSky Effect Reflections§r
+option.SKY_EFFECT_REFLECTION_DEFINE.comment=Enables reflections to have sky effects visible; like clouds, stars, and aurora borealis. "ON - Water" option will enable sky effects on water and translucent reflections, while "ON - Full" will enable them on block reflections as well. §e[*]§r "Set By DQ" means that this setting is determined by "Detail Quality" in Performance Settings unless you change it.
+value.SKY_EFFECT_REFLECTION_DEFINE.-1=§aSet By DQ
+value.SKY_EFFECT_REFLECTION_DEFINE.0=§aOFF
+value.SKY_EFFECT_REFLECTION_DEFINE.1=§cON - Water
+value.SKY_EFFECT_REFLECTION_DEFINE.2=§4§l§n§oON - Full
 
 option.GENERATED_NORMALS=Generated Normals
 option.GENERATED_NORMALS.comment=Adds auto-generated bumpy details to surfaces. §e[*]§r RP Support option must be set to Integrated PBR+. §e[*]§r Can look wonky with some resource packs or mods that feature non-standard resolution textures.
@@ -1032,8 +1054,8 @@ option.DARK_OUTLINE.comment=Adds dark outlines around blocks. §c[-]§r This eff
 option.DARK_OUTLINE_THICKNESS=§eDark Outline Thickness§r
 option.DARK_OUTLINE_THICKNESS.comment=Determines the thickness of the Dark Outline effect. §c[-]§r Increasing this setting can impact performance.
 
-option.RAIN_PUDDLES=§eRain Puddles§r
-option.RAIN_PUDDLES.comment=Adds water puddles to the terrain during rain. §c[-]§r Rain puddles can severely impact performance.
+option.RAIN_PUDDLES=Rain Puddles
+option.RAIN_PUDDLES.comment=Adds water puddles to the terrain during rain. §e[*]§r "Block Reflection Quality" must be enabled for this to work. §e[*]§r Rain puddles have a problem where they can appear inside interiors if the roof is made of glass, but this issue is fixed by the "Advanced Color Tracing" system when that option is enabled.
 value.RAIN_PUDDLES.0=§aOFF
 value.RAIN_PUDDLES.1=§cPuddles in Rain
 value.RAIN_PUDDLES.2=§cFull Coverage in Rain
@@ -1090,7 +1112,11 @@ option.COLORED_CANDLE_LIGHT=Colored Candle Lighting
 option.COLORED_CANDLE_LIGHT.comment=Makes lights cast by candles to be the same color as their bases. §e[*]§r The desaturated candle color variants will continue to use the usual fire color.
 
 option.COLORED_LIGHT_SATURATION=Colored Lighting Saturation
-option.COLORED_LIGHT_SATURATION.comment=Adjusts how saturated the colors produced from Advanced Color Tracing will be. §e[*]§r It's not recommended to change this value, as the visuals are designed to look the most balanced with the default saturation.
+option.COLORED_LIGHT_SATURATION.comment=Adjusts how saturated the colors produced from Advanced Color Tracing will be, including torches §e[*]§r It's not recommended to change this value, as the visuals are designed to look the most balanced with the default saturation.
+
+option.ACT_FIRE_COLOR_WARMNESS=Torch/Fire Color Warmness
+option.ACT_FIRE_COLOR_WARMNESS.comment=Adjusts the warmness of torch/fire/lantern light colors when Advanced Color Tracing is enabled. Note that the color is also affected by the "Colored Lighting Saturation" setting. §e[*]§r It's not recommended to change this value more than a tiny amount, as the visuals are designed to look the most balanced with the default level.
+value.ACT_FIRE_COLOR_WARMNESS.100=Normal
 
 option.COLORED_LIGHT_FOG=§eColored Light Fog§r
 option.COLORED_LIGHT_FOG.comment=Adds volumetric blocklight fog to the scene, most visible during the night or underground. §e[*]§r This feature only works if Advanced Color Tracing is on in Performance Settings and your system supports it. §c[-]§r This effect can severely impact performance.

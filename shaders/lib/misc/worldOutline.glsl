@@ -22,19 +22,19 @@ void DoWorldOutline(inout vec3 color, float linearZ0, vec3 playerPos, float fres
     vec2 absCheckCoord = abs(checkCoord - vec2(0.5));
     float outlineMult = max0(0.5 - max(absCheckCoord.x, absCheckCoord.y));
           outlineMult = min1(outlineMult * 0.1 / (scale.x * WORLD_OUTLINE_THICKNESS));
- 
+
     #if defined DISTANT_HORIZONS || defined VOXY
         float horizontalDistance = length(playerPos.xz);
         float verticalDistance = abs(playerPos.y);
         float fadeEndistance = max(horizontalDistance, verticalDistance);
-    
+
         #ifdef DISTANT_HORIZONS
             float farM = far * 0.8;
         #else
             float farM = far * 0.95;
         #endif
         float fade = smoothstep(far * 0.4, farM, fadeEndistance);
-        
+
         outlineMult *= 1.0 - fade;
     #endif
 
@@ -53,6 +53,6 @@ void DoWorldOutline(inout vec3 color, float linearZ0, vec3 playerPos, float fres
     float outline = clamp(slope / threshold, 0.0, 1.0) * WORLD_OUTLINE_I;
 
     outline *= outlineMult;
- 
+
     color += min(color * outline, vec3(outline));
 }

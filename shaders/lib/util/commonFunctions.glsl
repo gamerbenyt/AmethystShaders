@@ -1,22 +1,20 @@
+// Do these via macro as Apple otherwise complains
+#define SUN_ROTATION_DATA vec2(cos(sunPathRotation * 0.01745329251994), -sin(sunPathRotation * 0.01745329251994))
+
+#ifdef OVERWORLD
+    float overworldAngleRaw = fract(timeAngle - 0.25);
+    float overworldAngle = (overworldAngleRaw + (cos(overworldAngleRaw * 3.14159265358979) * -0.5 + 0.5 - overworldAngleRaw) / 3.0) * 6.28318530717959;
+    #define GetSunVector() normalize((gbufferModelView * vec4(vec3(-sin(overworldAngle), cos(overworldAngle) * SUN_ROTATION_DATA) * 2000.0, 1.0)).xyz)
+#elif defined END
+    #define GetSunVector() normalize((gbufferModelView * vec4(vec3(0.0, SUN_ROTATION_DATA * 2000.0), 1.0)).xyz)
+#else
+    #define GetSunVector() vec3(0.0)
+#endif
+
 #ifdef VERTEX_SHADER
     vec2 GetLightMapCoordinates() {
         vec2 lmCoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
         return clamp((lmCoord - 0.03125) * 1.06667, 0.0, 1.0);
-    }
-#endif
-#if defined VERTEX_SHADER || defined VOXY_PATCH
-    vec3 GetSunVector() {
-        const vec2 sunRotationData = vec2(cos(sunPathRotation * 0.01745329251994), -sin(sunPathRotation * 0.01745329251994));
-        #ifdef OVERWORLD
-            float ang = fract(timeAngle - 0.25);
-            ang = (ang + (cos(ang * 3.14159265358979) * -0.5 + 0.5 - ang) / 3.0) * 6.28318530717959;
-            return normalize((gbufferModelView * vec4(vec3(-sin(ang), cos(ang) * sunRotationData) * 2000.0, 1.0)).xyz);
-        #elif defined END
-            float ang = 0.0;
-            return normalize((gbufferModelView * vec4(vec3(0.0, sunRotationData * 2000.0), 1.0)).xyz);
-        #else
-            return vec3(0.0);
-        #endif
     }
 #endif
 
@@ -50,9 +48,9 @@ float GetHorizonFactor(float XdotU) {
     #endif
 }
 
-bool CheckForColor(vec3 albedo, vec3 check) { // Thanks to Builderb0y
+bool CheckForColor(vec3 albedo, vec3 check) { // Thanks to Builderb0y - edited a bit later
     vec3 dif = albedo - check * 0.003921568;
-    return dif == clamp(dif, vec3(-0.001), vec3(0.001));
+    return dot(dif, dif) < 0.00001;
 }
 
 bool CheckForStick(vec3 albedo) {
@@ -88,7 +86,7 @@ float GetSkyLightFactor(vec2 lmCoordM, vec3 shadowMult) {
         #endif
 
         #if defined GBUFFERS_WATER || defined DH_WATER
-            #if SHADOW_QUALITY > -1 && WATER_REFLECT_QUALITY >= 2 && WATER_MAT_QUALITY >= 2
+            #if SHADOW_QUALITY > -1 && WATER_REFLECT_QUALITY >= 2 && !defined LOW_QUALITY_WATER_MATERIAL
                 skyLightFactor = max(skyLightFactor, dot(shadowMult, shadowMult) * 0.333333);
             #endif
         #endif
@@ -112,6 +110,14 @@ float minOf(vec3 x) {
 
 int minOf(ivec3 x) {
     return min(x.x, min(x.y, x.z));
+}
+
+float maxOf(vec3 x) {
+    return max(x.x, max(x.y, x.z));
+}
+
+int maxOf(ivec3 x) {
+    return max(x.x, max(x.y, x.z));
 }
 
 int min1(int x) {

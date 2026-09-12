@@ -5,7 +5,7 @@
 
     float regularEdge = 10.0;
     float extraEdgeMult = 2.0;
-    
+
     float farEdgeDist = 128.0;
 #elif TAA_SMOOTHING == 3
     float blendMinimum = 0.35;
@@ -14,7 +14,7 @@
 
     float regularEdge = 6.0;
     float extraEdgeMult = 3.0;
-    
+
     float farEdgeDist = 112.0;
 #elif TAA_SMOOTHING == 4
     float blendMinimum = 0.5;
@@ -23,7 +23,7 @@
 
     float regularEdge = 4.0;
     float extraEdgeMult = 3.5;
-    
+
     float farEdgeDist = 96.0;
 #endif
 
@@ -151,7 +151,7 @@ void DoTAA(inout vec3 color, inout vec3 temp, float z1) {
     if (
         abs(materialMask - 149.5) < 50.0 // Entity Reflection Handling (see common.glsl for details)
         || materialMask == 254 // No SSAO, No TAA, Reduce Reflection
-    ) { 
+    ) {
         return;
     }
 
@@ -172,7 +172,7 @@ void DoTAA(inout vec3 color, inout vec3 temp, float z1) {
 
     vec2 prvCoord = texCoord;
     if (z1 > 0.56) prvCoord = Reprojection(viewPos1);
-    
+
 	#if defined DISTANT_HORIZONS || defined VOXY
         bool lodChunk = false;
     	if (z1 == 1.0) {
@@ -224,6 +224,24 @@ void DoTAA(inout vec3 color, inout vec3 temp, float z1) {
     float blendFactor = float(prvCoord.x > 0.0 && prvCoord.x < 1.0 &&
                               prvCoord.y > 0.0 && prvCoord.y < 1.0);
     float velocityFactor = dot(velocity, velocity) * 10.0;
+
+    #ifdef END
+        if (z1 == 1.0)
+        #if defined DISTANT_HORIZONS || defined VOXY
+            if (!lodChunk)
+        #endif
+        {
+            blendVariable *= 0.0;
+            #if LIGHTSHAFT_QUALI_DEFINE == 2 // Medium (Default)
+                edge = max(edge, regularEdge * 0.5);
+            #elif LIGHTSHAFT_QUALI_DEFINE == 3 // High
+                edge = max(edge, regularEdge * 0.75);
+            #elif LIGHTSHAFT_QUALI_DEFINE == 4 // Very High
+                edge = max(edge, regularEdge);
+            #endif
+        }
+    #endif
+
     blendFactor *= max(exp(-velocityFactor) * blendVariable + blendConstant - min(length(cameraPosition - previousCameraPosition), 0.05) * edge, blendMinimum);
 
     color = mix(color, tempColor, blendFactor);

@@ -2,9 +2,9 @@ if (mat < 32008) {
     if (mat < 30016) {
         if (mat < 30008) {
             if (mat == 30000) { //
-            
+
             } else if (mat == 30004) { //
-            
+
             }
         } else {
             if (mat == 30008) { // Tinted Glass
@@ -16,12 +16,21 @@ if (mat < 32008) {
                 color.a = pow(color.a, 1.0 - fresnelM);
                 reflectMult = 1.0;
 
-                #ifndef MIRROR_TINTED_GLASS
+                #if MIRROR_TINTED_GLASS == 0
                     DoTranslucentTweaks(color, fresnelM, reflectMult, lViewPos);
-                #else
+                #elif MIRROR_TINTED_GLASS == 35
+                    color.a = color.a * 0.65 + 0.35;
+                    fresnelM = fresnelM * 0.75 + 0.25;
+                    reflectMult /= color.a * 0.5 + 0.5;
+                    noGeneratedNormals = true;
+                #elif MIRROR_TINTED_GLASS == 70
                     color.a = color.a * 0.3 + 0.7;
                     fresnelM = fresnelM * 0.5 + 0.5;
                     reflectMult /= color.a;
+                    noGeneratedNormals = true;
+                #elif MIRROR_TINTED_GLASS == 100
+                    color.a = 0.99;
+                    fresnelM = 1.0;
                     noGeneratedNormals = true;
                 #endif
             } else /*if (mat == 30012)*/ { // Slime Block

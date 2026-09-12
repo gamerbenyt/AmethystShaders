@@ -85,7 +85,7 @@ noDirectionalShading = true;
                 edge = 1.0; break;
             }
         }
-        
+
         #ifdef END
             // No edge effect in the middle of the return fountain
             vec2 var1 = abs(playerPos.xz + cameraPosition.xz - 0.5);

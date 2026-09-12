@@ -36,10 +36,12 @@
     }
 
     vec4 GetComplexLightVolume(vec3 pos, sampler3D ff_sampler) {
-        vec4 lightVolume;
+        vec4 lightVolume = vec4(0.0);
 
-        #if defined COMPOSITE || defined COMPOSITE1 || defined DEFERRED1
-            #undef ACT_CORNER_LEAK_FIX
+        #ifndef ACT_CORNER_LEAK_FIX_FOR_WSR
+            #if defined COMPOSITE || defined COMPOSITE1 || defined DEFERRED1
+                #undef ACT_CORNER_LEAK_FIX
+            #endif
         #endif
 
         #ifndef ACT_CORNER_LEAK_FIX
@@ -94,7 +96,7 @@
     }
 
     vec4 GetLightVolume(vec3 pos) {
-        vec4 lightVolume;
+        vec4 lightVolume = vec4(0.0);
 
         if (int(framemod2) == 0) {
             lightVolume = GetComplexLightVolume(pos, floodfill_sampler_copy);
@@ -412,7 +414,7 @@
                 #if defined GBUFFERS_COLORWHEEL || defined SHADOW_COLORWHEEL
                     voxelData = voxelData | 32768;
                 #endif
-                
+
                 imageStore(voxel_img, ivec3(voxelPos), uvec4(voxelData, 0u, 0u, 0u));
             }
         }

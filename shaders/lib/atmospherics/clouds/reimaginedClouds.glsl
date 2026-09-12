@@ -132,7 +132,7 @@ vec4 GetVolumetricClouds(int cloudAltitude, float distanceThreshold, inout float
             colorSample *= pow2(1.0 - maxBlindnessDarkness);
 
             float cloudDistanceFactor = clamp(distanceRatio, 0.0, 0.75);
-            
+
             volumetricClouds.a = sqrt(cloudDistanceFactor * 1.33333) * cloudMult;
             volumetricClouds.rgb = colorSample;
 

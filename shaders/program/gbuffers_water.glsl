@@ -19,19 +19,23 @@ in vec2 texCoord;
 in vec2 signMidCoordPos;
 flat in vec2 absMidCoordPos;
 
-flat in vec3 upVec, sunVec, northVec, eastVec;
 in vec3 playerPos;
 in vec3 normal;
 in vec3 viewVector;
 
 in vec4 glColor;
 
-#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && WATER_MAT_QUALITY >= 2 || defined GENERATED_NORMALS || defined CUSTOM_PBR
+#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && !defined LOW_QUALITY_WATER_MATERIAL || defined GENERATED_NORMALS || defined CUSTOM_PBR
     flat in vec3 binormal, tangent;
 #endif
 
 #ifdef POM
     in vec4 vTexCoordAM;
+#endif
+
+#if ANISOTROPIC_FILTER > 0 && defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
+    flat in vec2 midCoord;
+    in vec4 spriteBounds;
 #endif
 
 #ifdef IRIS_FEATURE_FADE_VARIABLE
@@ -41,6 +45,12 @@ in vec4 glColor;
 //Pipeline Constants//
 
 //Common Variables//
+vec3 upVec = normalize(gbufferModelView[1].xyz);
+vec3 eastVec = normalize(gbufferModelView[0].xyz);
+vec3 northVec = normalize(gbufferModelView[2].xyz);
+
+vec3 sunVec = GetSunVector();
+
 float NdotU = dot(normal, upVec);
 float NdotUmax0 = max(NdotU, 0.0);
 float SdotU = dot(sunVec, upVec);
@@ -57,7 +67,7 @@ float shadowTime = shadowTimeVar2 * shadowTimeVar2;
     vec3 lightVec = sunVec;
 #endif
 
-#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && WATER_MAT_QUALITY >= 2 || defined GENERATED_NORMALS || defined CUSTOM_PBR
+#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && !defined LOW_QUALITY_WATER_MATERIAL || defined GENERATED_NORMALS || defined CUSTOM_PBR
     mat3 tbnMatrix = mat3(
         tangent.x, binormal.x, normal.x,
         tangent.y, binormal.y, normal.y,
@@ -82,7 +92,7 @@ float GetLinearDepth(float depth) {
 #endif
 
 #if WATER_REFLECT_QUALITY >= 0
-    #if defined SKY_EFFECT_REFLECTION && defined OVERWORLD
+    #if defined SKY_EFFECT_REFLECTION_TRANSLUCENT && defined OVERWORLD
         #if AURORA_STYLE > 0
             #include "/lib/atmospherics/auroraBorealis.glsl"
         #endif
@@ -105,7 +115,7 @@ float GetLinearDepth(float depth) {
     #include "/lib/antialiasing/jitter.glsl"
 #endif
 
-#if defined GENERATED_NORMALS || defined COATED_TEXTURES || WATER_STYLE >= 2
+#if defined GENERATED_NORMALS || defined COATED_TEXTURES || WATER_STYLE >= 2 || ANISOTROPIC_FILTER > 0 && defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
     #include "/lib/util/miplevel.glsl"
 #endif
 
@@ -140,9 +150,17 @@ float GetLinearDepth(float depth) {
     #include "/lib/materials/materialMethods/connectedGlass.glsl"
 #endif
 
+#if ANISOTROPIC_FILTER > 0 && defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
+    #include "/lib/materials/materialMethods/anisotropicFiltering.glsl"
+#endif
+
 //Program//
 void main() {
-    vec4 colorP = texture2D(tex, texCoord);
+    #if ANISOTROPIC_FILTER == 0 || !defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
+        vec4 colorP = texture2D(tex, texCoord);
+    #else
+        vec4 colorP = textureAF(tex, texCoord);
+    #endif
 
     #ifdef GBUFFERS_COLORWHEEL_TRANSLUCENT
         float ao;
@@ -204,7 +222,7 @@ void main() {
 
     #include "/lib/materials/materialHandling/translucentMaterials.glsl"
 
-    #if WATER_MAT_QUALITY >= 3 && SELECT_OUTLINE == 4
+    #if defined WATER_REFRACTION && SELECT_OUTLINE == 4
         int materialMaskInt = int(texelFetch(colortex6, texelCoord, 0).g * 255.1);
         if (materialMaskInt == 252) {
             materialMask = OSIEBCA * 252.0; // Versatile Selection Outline
@@ -271,6 +289,7 @@ void main() {
     gl_FragData[0] = color;
     gl_FragData[1] = vec4(1.0 - translucentMult.rgb, translucentMult.a);
 
+    // supposed to be " #if defined WATER_REFRACTION || (WATER_REFLECT_QUALITY > 0 && WORLD_SPACE_REFLECTIONS_INTERNAL > 0) " but Optifine bad
     #if DETAIL_QUALITY >= 3 || (WATER_REFLECT_QUALITY > 0 && WORLD_SPACE_REFLECTIONS > 0)
         /* DRAWBUFFERS:036 */
         gl_FragData[2] = vec4(1.0, materialMask, skyLightFactor, 1.0);
@@ -303,19 +322,23 @@ out vec2 texCoord;
 out vec2 signMidCoordPos;
 flat out vec2 absMidCoordPos;
 
-flat out vec3 upVec, sunVec, northVec, eastVec;
 out vec3 playerPos;
 out vec3 normal;
 out vec3 viewVector;
 
 out vec4 glColor;
 
-#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && WATER_MAT_QUALITY >= 2 || defined GENERATED_NORMALS || defined CUSTOM_PBR
+#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && !defined LOW_QUALITY_WATER_MATERIAL || defined GENERATED_NORMALS || defined CUSTOM_PBR
     flat out vec3 binormal, tangent;
 #endif
 
 #ifdef POM
     out vec4 vTexCoordAM;
+#endif
+
+#if ANISOTROPIC_FILTER > 0 && defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
+    flat out vec2 midCoord;
+    out vec4 spriteBounds;
 #endif
 
 #ifdef IRIS_FEATURE_FADE_VARIABLE
@@ -328,7 +351,7 @@ attribute vec4 mc_midTexCoord;
 attribute vec4 at_tangent;
 
 //Common Variables//
-#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && WATER_MAT_QUALITY >= 2 || defined GENERATED_NORMALS || defined CUSTOM_PBR
+#if WATER_STYLE >= 2 || RAIN_PUDDLES >= 1 && WATER_STYLE == 1 && !defined LOW_QUALITY_WATER_MATERIAL || defined GENERATED_NORMALS || defined CUSTOM_PBR
 #else
     vec3 binormal;
     vec3 tangent;
@@ -355,10 +378,6 @@ void main() {
     mat = int(mc_Entity.x + 0.5);
 
     normal = normalize(gl_NormalMatrix * gl_Normal);
-    upVec = normalize(gbufferModelView[1].xyz);
-    eastVec = normalize(gbufferModelView[0].xyz);
-    northVec = normalize(gbufferModelView[2].xyz);
-    sunVec = GetSunVector();
 
     vec3 rawBinormal = gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w;
     binormal = rawBinormal * inversesqrt(max(dot(rawBinormal, rawBinormal), 1e-8));
@@ -373,7 +392,11 @@ void main() {
 
     viewVector = tbnMatrix * (gl_ModelViewMatrix * gl_Vertex).xyz;
 
-    vec2 midCoord = (gl_TextureMatrix[0] * mc_midTexCoord).st;
+    #if ANISOTROPIC_FILTER == 0 || !defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
+        vec2 midCoord = (gl_TextureMatrix[0] * mc_midTexCoord).st;
+    #else
+        midCoord = (gl_TextureMatrix[0] * mc_midTexCoord).st;
+    #endif
     vec2 texMinMidCoord = texCoord - midCoord;
     signMidCoordPos = sign(texMinMidCoord);
     absMidCoordPos  = abs(texMinMidCoord);
@@ -394,6 +417,16 @@ void main() {
 
     #ifdef TAA
         gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
+    #endif
+
+    #if ANISOTROPIC_FILTER > 0 && defined ANISOTROPIC_FILTER_ON_TRANSLUCENTS
+        vec3 upVec = normalize(gbufferModelView[1].xyz);
+        if (mc_Entity.y > 0.5 && dot(normal, upVec) < 0.999) absMidCoordPos = vec2(0.0); // Fix257062
+
+        vec2 spriteRadius = abs(texCoord - mc_midTexCoord.xy);
+        vec2 bottomLeft = mc_midTexCoord.xy - spriteRadius;
+        vec2 topRight = mc_midTexCoord.xy + spriteRadius;
+        spriteBounds = vec4(bottomLeft, topRight);
     #endif
 
     #ifdef IRIS_FEATURE_FADE_VARIABLE

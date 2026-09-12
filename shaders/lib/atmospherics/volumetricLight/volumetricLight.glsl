@@ -22,7 +22,7 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
 
         if (sunVisibility < 0.5) {
             vlSceneIntensity = 0.0;
-            
+
             float vlMultNightModifier = (0.3 + 0.4 * rainFactor2 + 0.5 * max0(far - lViewPos1) / far);
             #ifdef SPECIAL_PALE_GARDEN_LIGHTSHAFTS
                 vlMultNightModifier = mix(vlMultNightModifier, 1.0, inPaleGarden);
@@ -73,13 +73,25 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
     #if defined VOXY || defined DISTANT_HORIZONS
         sky = sky && z1lod == 1.0;
     #endif
-    
+
     #if LIGHTSHAFT_QUALI_DEFINE == 0 || LIGHTSHAFT_QUALI_DEFINE == 1 // OFF - Function still active in the End dimension || Low
-        int nearSamples = 6;
+        #ifdef OVERWORLD
+            int nearSamples = 6;
+        #else
+            int nearSamples = 10;
+        #endif
     #elif LIGHTSHAFT_QUALI_DEFINE == 2 // Medium (Default)
-        int nearSamples = 10;
-    #elif LIGHTSHAFT_QUALI_DEFINE == 3 // High (Default on Ultra profile)
-        int nearSamples = 15;
+        #ifdef OVERWORLD
+            int nearSamples = 10;
+        #else
+            int nearSamples = 15;
+        #endif
+    #elif LIGHTSHAFT_QUALI_DEFINE == 3 // High
+        #ifdef OVERWORLD
+            int nearSamples = 15;
+        #else
+            int nearSamples = 20;
+        #endif
     #elif LIGHTSHAFT_QUALI_DEFINE == 4 // Very High
         int nearSamples = 30;
     #endif
@@ -94,7 +106,7 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
 
         float maxDistance = far * 0.98; // The distance where the fog is 1.0 and we stop tracing
         float qualityThreshold = min(far, shadowDistance) * 0.98; // Only use farSamples from this point on to hit our maxDistance. Set higher than maxDistance to disable far samples
-        
+
         #if defined VOXY || defined DISTANT_HORIZONS
             maxDistance = renderDistance * 0.5; // Covers lod chunks
 
@@ -121,7 +133,7 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
         float fogCurve = 0.55;
         float sampleDistribution = 1.3;
         float sampleDistributionFar = 2.5;
-        
+
         nearSamples *= 3;
 
         #if !defined VOXY && !defined DISTANT_HORIZONS
@@ -142,11 +154,11 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
 
     vec3 nViewPosInSceneSpace = normalize(mat3(gbufferModelViewInverse) * nViewPos);
     vec3 rayDirection = nViewPosInSceneSpace;
-    float rayEnd = !sky ? min(lViewPos1, maxDistance) : maxDistance; 
+    float rayEnd = !sky ? min(lViewPos1, maxDistance) : maxDistance;
     float lastDistance = 0.0;
 
-    #if defined END && !defined VOXY && !defined DISTANT_HORIZONS
-        float fog = lViewPos0 / far;
+    #ifdef END
+        float fog = lViewPos0 / renderDistance;
         fog = pow2(pow2(fog));
         fog = 1.0 - exp(-3.0 * fog);
 
@@ -214,7 +226,7 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
                 }
             #endif
         }
-        
+
         else { // Far field low sample section
             float t = (float(i - nearSamples) + dither) / float(farSamples);
             nextDistance = mix(activeThreshold, maxDistance, pow(t, sampleDistributionFar));
@@ -250,14 +262,14 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
         float sliceWeight   = nextWeight - currentWeight;
 
         vec4 stepResult = vec4(localDensity * sliceWeight, sliceWeight);
-        
+
         // Result Coloring
         if (nextDistance > lViewPos0) stepResult.rgb *= translucentMult;
         #ifdef END
             vec3 beamPos = scenePos;
-            stepResult.rgb *= DrawEnderBeams(beamPos, nViewPos, beamScale);
+            stepResult.rgb *= DrawEnderBeams(vlFactor, beamPos, nViewPos, beamScale);
         #endif
-        
+
         volumetricLight += stepResult;
 
         lastDistance = nextDistance;
@@ -295,10 +307,22 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
                 int reduceAmount = 2;
 
                 int skyCheck = 0;
+                float translucentDistanceTreshold = 5.0 / far;
                 for (float i = 0.1; i < 1.0; i += 0.2) {
-                    skyCheck += int(texelFetch(depthtex0, ivec2(view.x * i, view.y * 0.9), 0).x == 1.0);
+                    ivec2 checkCoord = ivec2(view.x * i, view.y * 0.9);
+                    float depth0Check = texelFetch(depthtex0, checkCoord, 0).x;
+
+                    if (GetLinearDepth(depth0Check) < translucentDistanceTreshold) {
+                        float depth1Check = texelFetch(depthtex1, checkCoord, 0).x;
+
+                        if (depth1Check == 1.0) {
+                            skyCheck += 1;
+                        }
+                    } else if (depth0Check == 1.0) {
+                        skyCheck += 1;
+                    }
                 }
-                if (skyCheck >= 4) {
+                if (skyCheck >= 3) {
                     salsCheck = 0.0;
                     reduceAmount = 3;
                 }
@@ -316,26 +340,27 @@ vec4 GetVolumetricLight(inout float vlFactor, vec3 translucentMult, float lViewP
 // ============================== Step 5: Final Tweaks ============================== //
     #ifdef OVERWORLD
         vlColor = pow(vlColor, vec3(0.5 + (0.5 + LIGHTSHAFT_SUNSET_SATURATION * sunVisibility) * invNoonFactor * invRainFactor + 0.3 * rainFactor));
-        vlColor *= 1.0 - (0.3 + 0.3 * noonFactor) * rainFactor - 0.5 * rainyNight + sunVisibility * pow2(invNoonFactor) * invRainFactor;
+        vlColor *= 1.0 - (0.3 + 0.3 * noonFactor) * rainFactor - 0.5 * rainyNight + sunVisibility * invNoonFactor2 * invRainFactor;
 
-        #if LIGHTSHAFT_DAY_I != 100 || LIGHTSHAFT_NIGHT_I != 100 || LIGHTSHAFT_RAIN_I != 100
-            #define LIGHTSHAFT_DAY_IM LIGHTSHAFT_DAY_I * 0.01
+        #if LIGHTSHAFT_NOON_I != 100 || LIGHTSHAFT_SUNSET_I != 100 || LIGHTSHAFT_NIGHT_I != 100 || LIGHTSHAFT_RAIN_I != 100
+            #define LIGHTSHAFT_NOON_IM LIGHTSHAFT_NOON_I * 0.01
+            #define LIGHTSHAFT_SUNSET_IM LIGHTSHAFT_SUNSET_I * 0.01
             #define LIGHTSHAFT_NIGHT_IM LIGHTSHAFT_NIGHT_I * 0.01
             #define LIGHTSHAFT_RAIN_IM LIGHTSHAFT_RAIN_I * 0.01
 
             if (isEyeInWater == 0) {
-                #if LIGHTSHAFT_DAY_I != 100 || LIGHTSHAFT_NIGHT_I != 100
-                    vlMult *= mix(LIGHTSHAFT_NIGHT_IM, LIGHTSHAFT_DAY_IM, sunVisibility);
-                #endif
-                #if LIGHTSHAFT_RAIN_I != 100
-                    vlMult *= mix(1.0, LIGHTSHAFT_RAIN_IM, rainFactor);
-                #endif
+                vlMult *= mix(LIGHTSHAFT_NIGHT_IM, mix(LIGHTSHAFT_SUNSET_IM, LIGHTSHAFT_NOON_IM, pow3(noonFactor)), sunVisibility);
+                vlMult *= mix(1.0, LIGHTSHAFT_RAIN_IM, rainFactor);
             }
         #endif
 
         volumetricLight.rgb *= vlColor;
     #elif defined END
-        
+
+    #endif
+
+    #ifdef SULFUR_CAVE_FOG
+        volumetricLight.rgb = mix(volumetricLight.rgb, vec3(GetLuminance(volumetricLight.rgb)) * vec3(1.0, 1.0, 0.5), inSulfurCaves);
     #endif
 
     volumetricLight.rgb *= vlMult;
